@@ -1,0 +1,32 @@
+version: '3.5'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USER}
+    container_name: db
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '${DATABASE_PORT}:5432'
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: server
+    environment:
+      - DATABASE_URL=postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@postgres:${DATABASE_PORT}/${DATABASE_NAME}?schema=public
+      - PORT=${PORT}
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      - db
+    volumes:
+      - ./src:/app/src
+    env_file:
+      - .env
