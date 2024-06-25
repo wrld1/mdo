@@ -18,20 +18,15 @@ export class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.CREATED)
-  @Post('register')
+  @Post('sign-up')
   async register(@Body() createUserDto: CreateUserDto): Promise<void> {
     return this.authService.register(createUserDto);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
-  @Post('login')
+  @Post('sign-in')
   async login(@Body() { email, password }: LoginDto) {
     return this.authService.login(email, password);
-  }
-
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

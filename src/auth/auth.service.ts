@@ -7,17 +7,19 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthEntity } from './entities/auth.entity';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from 'src/users/users.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UserDataService } from 'src/users/user-data.service';
+import { IUser } from 'src/interfaces/user';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private userDataService: UserDataService,
   ) {}
 
-  async register(createUserDto: CreateUserDto): Promise<void> {
-    await this.usersService.create(createUserDto);
+  async register(user: IUser): Promise<void> {
+    await this.userDataService.create(user);
   }
 
   async login(email: string, password: string): Promise<AuthEntity> {
@@ -34,7 +36,7 @@ export class AuthService {
     }
 
     return {
-      accessToken: this.jwtService.sign({ userId: user.id }),
+      accessToken: this.jwtService.sign({ uId: user.id }),
     };
   }
 }

@@ -20,18 +20,27 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  tokens Token[]
+  companies UserCompany[]
 
   @@map("users")
 }
 
-model Token {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+model Company {
+  id       Int          @id @default(autoincrement())
+  name     String
+  users    UserCompany[]
 
-  @@map("tokens")
+  @@map("companies")
 }
+
+model UserCompany {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  companyId Int
+
+  user      User    @relation(fields: [userId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@unique([userId, companyId])
+}
+

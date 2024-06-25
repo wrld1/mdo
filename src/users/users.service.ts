@@ -3,23 +3,20 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserDataService } from './user-data.service';
 
 export const roundsOfHashing = 10;
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userDataService: UserDataService,
+  ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      roundsOfHashing,
-    );
-
-    createUserDto.password = hashedPassword;
-
-    return this.prisma.user.create({
-      data: createUserDto,
+  async create(data: CreateUserDto) {
+    return await this.userDataService.create({
+      ...data,
     });
   }
 

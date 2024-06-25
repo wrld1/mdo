@@ -1,12 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { ILogin } from '../../interfaces/auth';
 
-export class LoginDto {
+export class LoginDto implements ILogin {
   @IsEmail()
-  @IsNotEmpty()
   email: string;
 
   @IsString()
   @IsNotEmpty()
-  @MinLength(6)
   password: string;
 }

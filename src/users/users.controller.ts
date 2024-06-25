@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-  Get,
-  Request,
-} from '@nestjs/common';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { Controller, Get, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Public } from 'src/auth/decorators/public';
 
@@ -16,7 +7,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Public()
-  @Get('users')
+  @Get()
   async getUsers(@Request() req) {
     return this.usersService.findAll();
   }
