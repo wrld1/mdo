@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CompanyType {
+  OSBB
+  ManagingCompany
+  CottageTown
+}
+
 
 model User {
   id    Int     @default(autoincrement()) @id
@@ -22,15 +28,16 @@ model User {
   updatedAt DateTime @updatedAt
   companies UserCompany[]
 
-  @@map("users")
+  @@map("user")
 }
 
 model Company {
   id       Int          @id @default(autoincrement())
   name     String
+  type     CompanyType
   users    UserCompany[]
 
-  @@map("companies")
+  @@map("company")
 }
 
 model UserCompany {

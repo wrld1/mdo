@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -19,6 +20,12 @@ export class AuthService {
   ) {}
 
   async register(user: IUser): Promise<void> {
+    const existingUser = await this.usersService.findOneByEmail(user.email);
+
+    if (existingUser) {
+      throw new ConflictException('User already exists');
+    }
+
     await this.userDataService.create(user);
   }
 
