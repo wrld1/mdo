@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDataService } from './user-data.service';
-import { CreateCompanyDto } from 'src/companies/dto/create-company.dto';
 import { CompanyType } from 'src/enums/CompanyType';
 
 export const roundsOfHashing = 10;

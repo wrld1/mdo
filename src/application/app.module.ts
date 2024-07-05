@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from 'src/auth/auth.module';
+import { CompaniesModule } from 'src/companies/companies.module';
+import { UserCompanyModule } from 'src/user-company/user-company.module';
+import { UsersModule } from 'src/users/users.module';
+import configuration from '../config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
-import configuration from '../config/configuration';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
-import { CompaniesModule } from 'src/companies/companies.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CompaniesModule } from 'src/companies/companies.module';
     AuthModule,
     UsersModule,
     CompaniesModule,
+    UserCompanyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

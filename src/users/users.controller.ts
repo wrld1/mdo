@@ -7,10 +7,9 @@ import {
   Post,
   Request,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
 import { Public } from 'src/auth/decorators/public';
-import { CreateCompanyDto } from 'src/companies/dto/create-company.dto';
 import { Assign } from './dto/assign.dto';
+import { UsersService } from './users.service';
 
 @Controller('user')
 export class UsersController {
