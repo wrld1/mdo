@@ -34,6 +34,10 @@ export class UsersService {
     // userId: number,
   ) {
     const userId = this.cls.get('userId');
+    const role = this.cls.get('role');
+
+    console.log('User ID:', userId);
+    console.log('Role:', role);
     const company = await this.companiesDataService.create({ name, type });
 
     switch (type) {

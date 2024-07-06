@@ -19,6 +19,7 @@ import { AppService } from './app.service';
         mount: true,
         setup: (cls, req) => {
           cls.set('userId', req.headers['x-user-id']);
+          cls.set('role', req.headers['x-user-role']);
         },
       },
     }),
