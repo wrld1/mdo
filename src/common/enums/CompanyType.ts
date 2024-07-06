@@ -4,4 +4,4 @@ export const Company = {
   CottageTown: 'CottageTown',
 } as const;
 
-export type CompanyType = (typeof Company)[keyof typeof Company];
+export type CompanyTypeEnum = (typeof Company)[keyof typeof Company];

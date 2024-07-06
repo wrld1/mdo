@@ -1,7 +1,10 @@
+import { CompanyType } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { IUserCompanyPagination } from 'src/common/interfaces/user-company';
 
-export class PaginationDto {
+export class PaginationDto implements IUserCompanyPagination {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -13,4 +16,8 @@ export class PaginationDto {
   @IsInt()
   @Min(1)
   limit?: number = 10;
+
+  @IsOptional()
+  @IsEnum(CompanyType)
+  type?: CompanyTypeEnum;
 }

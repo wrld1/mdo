@@ -1,11 +1,13 @@
-import { CompaniesDataService } from './../companies/companies-data.service';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CompanyType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
+import { CompaniesDataService } from './../companies/companies-data.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDataService } from './user-data.service';
-import { CompanyType } from 'src/enums/CompanyType';
 
 export const roundsOfHashing = 10;
 
@@ -15,6 +17,7 @@ export class UsersService {
     private prisma: PrismaService,
     private userDataService: UserDataService,
     private companiesDataService: CompaniesDataService,
+    private userCompanyDataService: UserCompanyDataService,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -23,12 +26,49 @@ export class UsersService {
     });
   }
 
-  async userAssign(name: string, type: CompanyType, userId: number) {
-    console.log('name from user service', name);
+  // async userAssign(name: string, type: CompanyType, userId: number) {
+  //   console.log('name from user service', name);
 
-    //switch chtobi rospoznavat type companii
+  //   //switch chtobi rospoznavat type companii
 
-    return this.companiesDataService.assignCompanyToUser(name, type, userId);
+  //   return this.companiesDataService.assignCompanyToUser(name, type, userId);
+  // }
+
+  async assignCompanyToUser(
+    name: string,
+    type: CompanyTypeEnum,
+    userId: number,
+  ) {
+    const company = await this.companiesDataService.create({ name, type });
+
+    switch (type) {
+      case CompanyType.OSBB:
+        await this.handleOSBBCompany(company.id, userId);
+        break;
+      case CompanyType.ManagingCompany:
+        await this.handleManagingCompany(company.id, userId);
+        break;
+      case CompanyType.CottageTown:
+        await this.handleCottageTownCompany(company.id, userId);
+        break;
+    }
+
+    return company;
+  }
+
+  private async handleOSBBCompany(companyId: number, userId: number) {
+    console.log('Assigning OSBB type company to user');
+    await this.userCompanyDataService.create({ userId, companyId });
+  }
+
+  private async handleManagingCompany(companyId: number, userId: number) {
+    console.log('Assigning ManagingCompany type company to user');
+    await this.userCompanyDataService.create({ userId, companyId });
+  }
+
+  private async handleCottageTownCompany(companyId: number, userId: number) {
+    console.log('Assigning CottageTown type company to user');
+    await this.userCompanyDataService.create({ userId, companyId });
   }
 
   async findAll() {

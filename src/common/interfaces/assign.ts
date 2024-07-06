@@ -1,4 +1,4 @@
-import { CompanyType } from 'src/enums/CompanyType';
+import { CompanyType } from 'src/common/enums/CompanyType';
 
 export interface IAssign {
   name: string;

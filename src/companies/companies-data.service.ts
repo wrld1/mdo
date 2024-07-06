@@ -1,6 +1,6 @@
-import { CompanyType } from './../enums/CompanyType';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CompanyType } from '../common/enums/CompanyType';
 import { CreateCompanyDto } from './dto/create-company.dto';
 
 @Injectable()

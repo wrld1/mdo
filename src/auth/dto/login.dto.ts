@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { ILogin } from '../../interfaces/auth';
+import { ILogin } from '../../common/interfaces/auth';
 
 export class LoginDto implements ILogin {
   @IsEmail()

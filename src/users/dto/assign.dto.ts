@@ -1,6 +1,6 @@
-import { IsString, IsNotEmpty, IsInt, IsEnum } from 'class-validator';
-import { Company, CompanyType } from 'src/enums/CompanyType';
-import { IAssign } from 'src/interfaces/assign';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { Company, CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { IAssign } from 'src/common/interfaces/assign';
 
 export class Assign implements IAssign {
   @IsString()
@@ -9,5 +9,5 @@ export class Assign implements IAssign {
 
   @IsEnum(Company)
   @IsNotEmpty()
-  type: CompanyType;
+  type: CompanyTypeEnum;
 }

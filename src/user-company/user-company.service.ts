@@ -8,6 +8,7 @@ export class UserCompanyService {
   constructor(private userCompanyDataService: UserCompanyDataService) {}
 
   async getAllCompanies(@Query() paginationDto: PaginationDto) {
-    return this.userCompanyDataService.getAllCompanies(paginationDto);
+    const { page, limit, type } = paginationDto;
+    return this.userCompanyDataService.getAllCompanies(page, limit, type);
   }
 }

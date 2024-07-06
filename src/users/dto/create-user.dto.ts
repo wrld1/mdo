@@ -1,6 +1,6 @@
-import { IsString, IsEmail, MinLength, Matches } from 'class-validator';
-import { IUser } from 'src/interfaces/user';
-import { passwordRegex } from 'src/utils/constants';
+import { IsEmail, IsString, Matches, MinLength } from 'class-validator';
+import { IUser } from 'src/common/interfaces/user';
+import { passwordRegex } from 'src/common/utils/constants';
 
 export class CreateUserDto implements IUser {
   @IsEmail()

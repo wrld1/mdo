@@ -1,15 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
-import { UserCompanyService } from './user-company.service';
+import { Controller, Get, Query } from '@nestjs/common';
 import { PaginationDto } from './dto/user-company-pagination.dto';
+import { UserCompanyService } from './user-company.service';
 
 @Controller('user-company')
 export class UserCompanyController {
