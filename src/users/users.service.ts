@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CompanyType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { ClsService } from 'nestjs-cls';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
@@ -14,6 +15,7 @@ export const roundsOfHashing = 10;
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly cls: ClsService,
     private prisma: PrismaService,
     private userDataService: UserDataService,
     private companiesDataService: CompaniesDataService,
@@ -26,19 +28,12 @@ export class UsersService {
     });
   }
 
-  // async userAssign(name: string, type: CompanyType, userId: number) {
-  //   console.log('name from user service', name);
-
-  //   //switch chtobi rospoznavat type companii
-
-  //   return this.companiesDataService.assignCompanyToUser(name, type, userId);
-  // }
-
   async assignCompanyToUser(
     name: string,
     type: CompanyTypeEnum,
-    userId: number,
+    // userId: number,
   ) {
+    const userId = this.cls.get('userId');
     const company = await this.companiesDataService.create({ name, type });
 
     switch (type) {
