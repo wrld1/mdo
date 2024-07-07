@@ -1,6 +1,6 @@
-import { CompanyType } from 'src/common/enums/CompanyType';
+import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
 
 export interface IAssign {
   name: string;
-  type: CompanyType;
+  type: CompanyTypeEnum;
 }

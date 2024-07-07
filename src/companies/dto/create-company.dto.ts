@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { Company, CompanyType } from 'src/common/enums/CompanyType';
+import { Company, CompanyTypeEnum } from 'src/common/enums/CompanyType';
 import { ICompany } from 'src/common/interfaces/company';
 
 export class CreateCompanyDto implements ICompany {
@@ -9,5 +9,5 @@ export class CreateCompanyDto implements ICompany {
 
   @IsEnum(Company)
   @IsNotEmpty()
-  type: CompanyType;
+  type: CompanyTypeEnum;
 }

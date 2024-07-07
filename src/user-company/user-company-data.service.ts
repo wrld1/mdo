@@ -8,8 +8,10 @@ export class UserCompanyDataService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAllCompanies(page: number, limit: number, type?: CompanyType) {
-    const skip = (page - 1) * limit;
-    const where = type ? { type } : {};
+    const skip = (page - 1) * limit; //perenesti v service
+    const where = type ? { type } : {}; //perenesti v service
+
+    //spisok kompanii mozhet poluchit tolko admin/superadmin/(prava read)
 
     const [companies, total] = await Promise.all([
       this.prisma.company.findMany({

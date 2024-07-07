@@ -35,6 +35,8 @@ model Company {
   id       Int          @id @default(autoincrement())
   name     String
   type     CompanyType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   users    UserCompany[]
 
   @@map("company")

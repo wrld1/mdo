@@ -1,10 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './application/app.module';
-import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory, PartialGraphHost } from '@nestjs/core';
+import * as fs from 'fs';
+import { AppModule } from './application/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    snapshot: true,
+    abortOnError: false,
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -15,4 +19,7 @@ async function bootstrap() {
 
   await app.listen(port);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  fs.writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
+  process.exit(1);
+});

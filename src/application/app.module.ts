@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ClsModule } from 'nestjs-cls';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 import { AuthModule } from 'src/auth/auth.module';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { UserCompanyModule } from 'src/user-company/user-company.module';
@@ -14,14 +14,8 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({
       load: [configuration],
     }),
-    ClsModule.forRoot({
-      middleware: {
-        mount: true,
-        setup: (cls, req) => {
-          cls.set('userId', req.headers['x-user-id']);
-          cls.set('role', req.headers['x-user-role']);
-        },
-      },
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,
     UsersModule,

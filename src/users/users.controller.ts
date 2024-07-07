@@ -26,6 +26,6 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() { name, type }: Assign,
   ) {
-    return this.usersService.assignCompanyToUser(name, type);
+    return this.usersService.assignCompanyToUser(name, type, id);
   }
 }

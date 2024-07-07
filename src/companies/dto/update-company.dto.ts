@@ -1,5 +1,5 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
-import { Company, CompanyType } from 'src/common/enums/CompanyType';
+import { Company, CompanyTypeEnum } from 'src/common/enums/CompanyType';
 
 export class UpdateCompanyDto {
   @IsOptional()
@@ -8,5 +8,5 @@ export class UpdateCompanyDto {
 
   @IsOptional()
   @IsEnum(Company)
-  type?: CompanyType;
+  type?: CompanyTypeEnum;
 }

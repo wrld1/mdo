@@ -9,13 +9,13 @@ export class PaginationDto implements IUserCompanyPagination {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  page?: number = 1;
+  page?: number = 1; // v dataservice вынести присваивание дефолтных значений
 
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  limit?: number = 10;
+  limit?: number = 10; // v dataservice вынести присваивание дефолтных значений
 
   @IsOptional()
   @IsEnum(CompanyType)
