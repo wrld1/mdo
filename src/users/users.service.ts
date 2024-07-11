@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { roundsOfHashing } from 'src/common/utils/shared/hashPassword';
 import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
 import { CompaniesDataService } from './../companies/companies-data.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDataService } from './user-data.service';
-
-export const roundsOfHashing = 10;
 
 @Injectable()
 export class UsersService {
