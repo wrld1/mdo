@@ -6,15 +6,18 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from 'src/application/constants/auth.contstants';
-import { IS_PUBLIC_KEY } from './decorators/public';
 import { Request } from 'express';
+import { jwtConstants } from 'src/application/constants/auth.contstants';
+import { Role } from 'src/common/enums/Role';
+import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
+import { IS_PUBLIC_KEY } from './decorators/public';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private reflector: Reflector,
+    private alsProvider: AsyncLocalStorageProvider,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -36,7 +39,14 @@ export class AuthGuard implements CanActivate {
         secret: jwtConstants.secret,
       });
 
+      payload.role = Role.User;
+
       request['user'] = payload;
+
+      this.alsProvider.run(() => {
+        const store = this.alsProvider.store;
+        store.set('user', payload);
+      });
     } catch {
       throw new UnauthorizedException();
     }
