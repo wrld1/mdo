@@ -5,11 +5,23 @@ import { AsyncLocalStorage } from 'async_hooks';
 export class AsyncLocalStorageProvider {
   private readonly storage = new AsyncLocalStorage<Map<string, any>>();
 
-  get store(): Map<string, any> {
+  run(store: Map<string, any>, callback: () => void) {
+    this.storage.run(store, callback);
+  }
+
+  getStore(): Map<string, any> {
     return this.storage.getStore();
   }
 
-  run(fn: () => void, store: Map<string, any> = new Map()) {
-    this.storage.run(store, fn);
+  set(key: string, value: any) {
+    const store = this.getStore();
+    if (store) {
+      store.set(key, value);
+    }
+  }
+
+  get(key: string): any {
+    const store = this.getStore();
+    return store ? store.get(key) : undefined;
   }
 }

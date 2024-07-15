@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CompanyType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserCompanyDto } from './dto/create-user-company.dto';
 
@@ -7,11 +7,12 @@ import { CreateUserCompanyDto } from './dto/create-user-company.dto';
 export class UserCompanyDataService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAllCompanies(page: number, limit: number, type?: CompanyType) {
-    const skip = (page - 1) * limit; //perenesti v service
-    const where = type ? { type } : {}; //perenesti v service
-
-    //spisok kompanii mozhet poluchit tolko admin/superadmin/(prava read)
+  async getAllCompanies(
+    page: number,
+    limit: number,
+    where?: Prisma.CompanyWhereInput,
+  ) {
+    const skip = (page - 1) * limit;
 
     const [companies, total] = await Promise.all([
       this.prisma.company.findMany({

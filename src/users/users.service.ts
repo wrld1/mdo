@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { Role } from 'src/common/enums/Role';
 import { roundsOfHashing } from 'src/common/utils/shared/hashPassword';
+import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
 import { CompaniesDataService } from './../companies/companies-data.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,6 +16,7 @@ export class UsersService {
     private companiesDataService: CompaniesDataService,
     private userCompanyDataService: UserCompanyDataService,
     private userDataService: UserDataService,
+    private alsProvider: AsyncLocalStorageProvider,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -31,6 +34,26 @@ export class UsersService {
 
     await this.userCompanyDataService.create({ userId, companyId: company.id });
     return company;
+  }
+
+  async assignManagerRole() {
+    const user = this.alsProvider.get('user');
+    if (!user) {
+      throw new Error('No user found in async local storage');
+    }
+
+    await this.userDataService.update(user.id, { role: Role.Manager });
+    return `User ${user.id} is now a Manager`;
+  }
+
+  async assignSuperAdminRole() {
+    const user = this.alsProvider.get('user');
+    if (!user) {
+      throw new Error('No user found in async local storage');
+    }
+
+    await this.userDataService.update(user.id, { role: Role.Manager });
+    return `User ${user.id} is now a SuperAdmin`;
   }
 
   async findAll() {

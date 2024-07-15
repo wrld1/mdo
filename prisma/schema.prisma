@@ -19,6 +19,12 @@ enum CompanyType {
   CottageTown
 }
 
+enum Role {
+  User
+  Manager
+  SuperAdmin
+}
+
 
 model User {
   id    Int     @default(autoincrement()) @id
@@ -27,6 +33,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   companies UserCompany[]
+  role Role
 
   @@map("user")
 }

@@ -39,13 +39,14 @@ export class AuthGuard implements CanActivate {
         secret: jwtConstants.secret,
       });
 
-      payload.role = Role.User;
+      if (!payload.role) {
+        payload.role = Role.User;
+      }
 
       request['user'] = payload;
 
-      this.alsProvider.run(() => {
-        const store = this.alsProvider.store;
-        store.set('user', payload);
+      this.alsProvider.run(new Map(), () => {
+        this.alsProvider.set('user', payload);
       });
     } catch {
       throw new UnauthorizedException();

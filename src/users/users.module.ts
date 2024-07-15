@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
 import { UserCompanyModule } from 'src/user-company/user-company.module';
 import { UserDataService } from './user-data.service';
 import { UsersController } from './users.controller';
@@ -10,6 +11,11 @@ import { UsersService } from './users.service';
   providers: [UsersService, UserDataService],
   exports: [UsersService, UserDataService],
   controllers: [UsersController],
-  imports: [CompaniesModule, UserCompanyModule, PrismaModule],
+  imports: [
+    CompaniesModule,
+    UserCompanyModule,
+    PrismaModule,
+    AsyncLocalStorageModule,
+  ],
 })
 export class UsersModule {}
