@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
 
 @Injectable()
 export class CompaniesDataService {
@@ -12,20 +13,16 @@ export class CompaniesDataService {
     });
   }
 
-  //   async assignCompanyToUser(
-  //     name: string,
-  //     type: CompanyTypeEnum,
-  //     userId: number,
-  //   ) {
-  //     const company = await this.create({ name, type });
-  //     await this.prisma.userCompany.create({
-  //       //userCompany data service
-  //       data: {
-  //         userId,
-  //         companyId: company.id,
-  //       },
-  //     });
-  //     //userCompany service
-  //     return company;
-  //   }
+  async update(id: number, data: UpdateCompanyDto) {
+    return this.prisma.company.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: number) {
+    return this.prisma.company.delete({
+      where: { id },
+    });
+  }
 }

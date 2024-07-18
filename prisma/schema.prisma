@@ -19,12 +19,10 @@ enum CompanyType {
   CottageTown
 }
 
-enum Role {
-  User
-  Manager
-  SuperAdmin
+enum AclPermission {
+  READ
+  WRITE
 }
-
 
 model User {
   id    Int     @default(autoincrement()) @id
@@ -33,9 +31,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   companies UserCompany[]
-  role Role
+  isVerified Boolean
+  Acl Acl[]
 
   @@map("user")
+
 }
 
 model Company {
@@ -58,5 +58,15 @@ model UserCompany {
   company   Company @relation(fields: [companyId], references: [id])
 
   @@unique([userId, companyId])
+}
+
+model Acl {
+  id Int     @id @default(autoincrement())
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  resource String
+  permission AclPermission
+
+  @@unique([userId, resource])
 }
 
