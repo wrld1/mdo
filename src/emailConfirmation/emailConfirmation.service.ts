@@ -15,10 +15,10 @@ export class EmailConfirmationService {
     private readonly usersService: UsersService,
   ) {}
 
-  public async confirmEmail(email: string) {
+  async confirmEmail(email: string) {
     const user = await this.usersService.findOneByEmail(email);
     if (user.isVerified) {
-      throw new BadRequestException('Email already confirmed');
+      return;
     }
     await this.usersService.confirmEmail(email);
   }
@@ -32,7 +32,7 @@ export class EmailConfirmationService {
       if (typeof payload === 'object' && 'email' in payload) {
         return payload.email;
       }
-      throw new BadRequestException();
+      throw new BadRequestException('Bad confirmation token');
     } catch (error) {
       if (error?.name === 'TokenExpiredError') {
         throw new BadRequestException('Email confirmation token expired');

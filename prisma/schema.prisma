@@ -31,7 +31,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   companies UserCompany[]
-  isVerified Boolean @default(false)
+  isVerified Boolean @default(false) //dobavit refresh token v tablicu usera
   Acl Acl[]
 
   @@map("user")
@@ -39,7 +39,7 @@ model User {
 }
 
 model Company {
-  id       Int          @id @default(autoincrement())
+  id       Int          @id @default(autoincrement()) //change id to uuid
   name     String
   type     CompanyType
   createdAt DateTime @default(now())
@@ -64,7 +64,7 @@ model Acl {
   id Int     @id @default(autoincrement())
   userId Int
   user User @relation(fields: [userId], references: [id])
-  resource String
+  resource String // CompanyManagement(general, dostup k management company companyManagement/companyId)
   permission AclPermission
 
   @@unique([userId, resource])
