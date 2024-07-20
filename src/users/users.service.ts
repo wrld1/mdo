@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AclDataService } from 'src/acl/acl-data.service';
 import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
@@ -61,6 +65,18 @@ export class UsersService {
     });
 
     return acl;
+  }
+
+  async confirmEmail(email: string): Promise<void> {
+    const user = await this.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (user.isVerified) {
+      throw new BadRequestException('Email already confirmed');
+    }
+    const updateUserDto: UpdateUserDto = { isVerified: true };
+    await this.update(user.id, updateUserDto);
   }
 
   async findAll() {
