@@ -18,4 +18,16 @@ export class AclDataService {
     });
     return acl;
   }
+
+  async checkPermission(input: CreateAclDto): Promise<boolean> {
+    const { userId, resource, permission } = input;
+    const acl = await this.prisma.acl.findFirst({
+      where: {
+        userId,
+        resource,
+        permission,
+      },
+    });
+    return !!acl;
+  }
 }

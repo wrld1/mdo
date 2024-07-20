@@ -31,7 +31,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   companies UserCompany[]
-  isVerified Boolean
+  isVerified Boolean @default(false)
   Acl Acl[]
 
   @@map("user")
@@ -43,7 +43,7 @@ model Company {
   name     String
   type     CompanyType
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt 
   users    UserCompany[]
 
   @@map("company")

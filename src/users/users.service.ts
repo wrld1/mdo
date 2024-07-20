@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { AclDataService } from 'src/acl/acl-data.service';
+import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { AclPermission } from 'src/common/enums/Permission';
 import { roundsOfHashing } from 'src/common/utils/shared/hashPassword';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
@@ -16,6 +19,7 @@ export class UsersService {
     private userCompanyDataService: UserCompanyDataService,
     private userDataService: UserDataService,
     private alsProvider: AsyncLocalStorageProvider,
+    private aclDataService: AclDataService,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -29,10 +33,34 @@ export class UsersService {
     type: CompanyTypeEnum,
     userId: number,
   ) {
+    const hasPermission = await this.aclDataService.checkPermission({
+      userId,
+      resource: '/:id/assign',
+      permission: AclPermission.WRITE,
+    });
+
+    if (!hasPermission) {
+      throw new ForbiddenException(
+        'You do not have permission to assign this resource.',
+      );
+    }
+
     const company = await this.companiesDataService.create({ name, type });
 
     await this.userCompanyDataService.create({ userId, companyId: company.id });
     return company;
+  }
+
+  async createAcl(input: CreateAclDto) {
+    const { userId, resource, permission } = input;
+
+    const acl = await this.aclDataService.createAcl({
+      userId,
+      resource,
+      permission,
+    });
+
+    return acl;
   }
 
   async findAll() {

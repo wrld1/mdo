@@ -1,9 +1,8 @@
-import { User } from '@prisma/client';
 import { AclPermission } from '../enums/Permission';
 
 export interface IAcl {
   userId: number;
-  user: User;
+  // user: User;
   resource: string;
   permission: AclPermission;
 }

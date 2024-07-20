@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtConstants } from 'src/application/constants/auth.contstants';
+import { jwtConstants } from 'src/common/constants/auth.constants';
 
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { IS_PUBLIC_KEY } from './decorators/public';
