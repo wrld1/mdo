@@ -10,7 +10,7 @@ import { Request } from 'express';
 import { jwtConstants } from 'src/common/constants/auth.constants';
 
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
-import { IS_PUBLIC_KEY } from './decorators/public';
+import { IS_PUBLIC_KEY } from '../common/decorators/public';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -36,7 +36,7 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
+        secret: jwtConstants.accessSecret,
       });
 
       request['user'] = payload;

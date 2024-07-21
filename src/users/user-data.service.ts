@@ -11,9 +11,12 @@ export class UserDataService {
   async create(data: IUser) {
     const hashedPassword = await hashPassword(data.password);
 
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: { ...data, password: hashedPassword },
     });
+
+    const { password, hashedRt, ...result } = user;
+    return result;
   }
 
   async findAll() {

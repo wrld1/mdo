@@ -5,6 +5,6 @@ import EmailService from './email.service';
 @Module({
   imports: [ConfigModule],
   providers: [EmailService],
-  exports: [EmailService], //sdelat v module setup pochti, (microservice)
+  exports: [EmailService], //sdelat v module setup pochti(mail), (microservice)
 })
 export class EmailModule {}

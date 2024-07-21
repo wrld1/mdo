@@ -8,7 +8,7 @@ import {
   Request,
 } from '@nestjs/common';
 import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
-import { Public } from 'src/auth/decorators/public';
+import { Public } from 'src/common/decorators/public';
 import { Assign } from './dto/assign.dto';
 import { UsersService } from './users.service';
 

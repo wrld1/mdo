@@ -18,5 +18,9 @@ export class UpdateUserDto {
 
   @IsBoolean()
   @IsOptional()
-  isVerified: boolean;
+  isVerified?: boolean;
+
+  @IsString()
+  @IsOptional()
+  hashedRt?: string;
 }

@@ -23,6 +23,7 @@ export class UserCompanyService {
 
     const user = this.alsProvider.get('user');
     if (user.role === Role.SuperAdmin) {
+      // change to permission check
       return this.userCompanyDataService.getAllCompanies(page, limit, where);
     } else {
       where = {

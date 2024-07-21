@@ -16,7 +16,7 @@ import { AuthService } from './auth.service';
     AsyncLocalStorageModule,
     JwtModule.register({
       global: true,
-      secret: jwtConstants.secret,
+      secret: jwtConstants.accessSecret,
       signOptions: { expiresIn: '15m' },
     }),
   ],

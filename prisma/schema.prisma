@@ -33,6 +33,7 @@ model User {
   companies UserCompany[]
   isVerified Boolean @default(false) //dobavit refresh token v tablicu usera
   Acl Acl[]
+  hashedRt String? @default("adawdasdasd")
 
   @@map("user")
 
