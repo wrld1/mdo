@@ -1,4 +1,4 @@
-import { Controller, Post, Delete, Body, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -13,12 +13,12 @@ export class CompaniesController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() data: UpdateCompanyDto) {
-    return this.companiesService.update(+id, data);
+  async update(@Param('id') id: string, @Body() data: UpdateCompanyDto) {
+    return this.companiesService.update(id, data);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number) {
-    return this.companiesService.delete(+id);
+  async delete(@Param('id') id: string) {
+    return this.companiesService.delete(id);
   }
 }

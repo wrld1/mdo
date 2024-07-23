@@ -13,11 +13,11 @@ export class CompaniesService {
     });
   }
 
-  async update(id: number, data: UpdateCompanyDto) {
+  async update(id: string, data: UpdateCompanyDto) {
     return await this.companiesDataService.update(id, data);
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.companiesDataService.delete(id);
   }
 }

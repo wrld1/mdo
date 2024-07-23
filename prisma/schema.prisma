@@ -31,7 +31,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   companies UserCompany[]
-  isVerified Boolean @default(false) //dobavit refresh token v tablicu usera
+  isVerified Boolean @default(false) 
   Acl Acl[]
   hashedRt String? @default("adawdasdasd")
 
@@ -40,7 +40,7 @@ model User {
 }
 
 model Company {
-  id       Int          @id @default(autoincrement()) //change id to uuid
+  id       String    @id @default(uuid())
   name     String
   type     CompanyType
   createdAt DateTime @default(now())
@@ -53,7 +53,7 @@ model Company {
 model UserCompany {
   id        Int     @id @default(autoincrement())
   userId    Int
-  companyId Int
+  companyId String
 
   user      User    @relation(fields: [userId], references: [id])
   company   Company @relation(fields: [companyId], references: [id])

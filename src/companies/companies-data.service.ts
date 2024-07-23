@@ -13,14 +13,14 @@ export class CompaniesDataService {
     });
   }
 
-  async update(id: number, data: UpdateCompanyDto) {
+  async update(id: string, data: UpdateCompanyDto) {
     return this.prisma.company.update({
       where: { id },
       data,
     });
   }
 
-  async delete(id: number) {
+  async delete(id: string) {
     return this.prisma.company.delete({
       where: { id },
     });
