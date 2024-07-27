@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAclDto } from './dto/create-acl.dto';
 
@@ -19,15 +23,36 @@ export class AclDataService {
     return acl;
   }
 
-  async checkPermission(input: CreateAclDto): Promise<boolean> {
-    const { userId, resource, permission } = input;
+  async checkPermission(userId: number, companyId: string) {
+    const possibleResources = [
+      `/companyManagement/${companyId}`,
+      `/company/${companyId}`,
+    ];
+
+    let isManager: boolean = false;
+
     const acl = await this.prisma.acl.findFirst({
       where: {
         userId,
-        resource,
-        permission,
+        resource: {
+          in: possibleResources,
+        },
       },
     });
-    return !!acl;
+
+    if (!acl) {
+      throw new NotFoundException('ACL not found for this user and resource');
+    }
+
+    if (acl.resource === `/companyManagement/${companyId}`) {
+      isManager = true;
+    } else if (acl.resource === `/company/${companyId}`) {
+      isManager = false;
+    } else {
+      throw new ForbiddenException(
+        'User does not have the required permission',
+      );
+    }
+    return isManager;
   }
 }

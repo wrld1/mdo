@@ -41,9 +41,7 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
 
-      this.alsProvider.run(new Map(), () => {
-        this.alsProvider.set('user', payload);
-      });
+      this.alsProvider.set('uId', payload.uId);
     } catch {
       throw new UnauthorizedException();
     }

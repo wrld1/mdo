@@ -65,7 +65,7 @@ model Acl {
   id Int     @id @default(autoincrement())
   userId Int
   user User @relation(fields: [userId], references: [id])
-  resource String // CompanyManagement(general, dostup k management company companyManagement/companyId)
+  resource String 
   permission AclPermission
 
   @@unique([userId, resource])

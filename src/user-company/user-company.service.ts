@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 import { Prisma } from '@prisma/client';
-import { Role } from 'src/common/enums/Role';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { PaginationDto } from './dto/user-company-pagination.dto';
 import { UserCompanyDataService } from './user-company-data.service';
@@ -22,17 +21,17 @@ export class UserCompanyService {
     }
 
     const user = this.alsProvider.get('user');
-    if (user.role === Role.SuperAdmin) {
-      // change to permission check
-      return this.userCompanyDataService.getAllCompanies(page, limit, where);
-    } else {
-      where = {
-        ...where,
-        users: {
-          some: { userId: user.id },
-        },
-      };
-      return this.userCompanyDataService.getAllCompanies(page, limit, where);
-    }
+    // if (user.role === Role.SuperAdmin) {
+    // change to permission check
+    return this.userCompanyDataService.getAllCompanies(page, limit, where);
+    // } else {
+    //   where = {
+    //     ...where,
+    //     users: {
+    //       some: { userId: user.id },
+    //     },
+    //   };
+    //   return this.userCompanyDataService.getAllCompanies(page, limit, where);
+    // }
   }
 }

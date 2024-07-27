@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
+import { AclModule } from 'src/acl/acl.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
 import { CompaniesDataService } from './companies-data.service';
 import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
@@ -8,6 +10,6 @@ import { CompaniesService } from './companies.service';
   controllers: [CompaniesController],
   providers: [CompaniesService, CompaniesDataService],
   exports: [CompaniesService, CompaniesDataService],
-  imports: [PrismaModule],
+  imports: [PrismaModule, AclModule, AsyncLocalStorageModule],
 })
 export class CompaniesModule {}

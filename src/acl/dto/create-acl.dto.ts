@@ -10,10 +10,6 @@ export class CreateAclDto implements IAcl {
   @IsString()
   resource: string;
 
-  // @ValidateNested()
-  // @Type(() => CreateUserDto)
-  // user: User;
-
   @IsEnum(AclPermission)
   permission: AclPermission;
 }

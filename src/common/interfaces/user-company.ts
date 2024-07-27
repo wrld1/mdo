@@ -2,7 +2,7 @@ import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
 
 export interface IUserCompany {
   userId: number;
-  companyId: number;
+  companyId: string;
 }
 
 export interface IUserCompanyPagination {

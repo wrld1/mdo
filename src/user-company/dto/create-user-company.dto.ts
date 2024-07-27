@@ -8,5 +8,5 @@ export class CreateUserCompanyDto implements IUserCompany {
 
   @IsNotEmpty()
   @IsInt()
-  companyId: number;
+  companyId: string;
 }

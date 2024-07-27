@@ -17,6 +17,8 @@ export class AsyncLocalStorageProvider {
     const store = this.getStore();
     if (store) {
       store.set(key, value);
+    } else {
+      console.warn('Attempting to set ALS value outside of context');
     }
   }
 
