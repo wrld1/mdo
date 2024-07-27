@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import EmailService from 'src/email/email.service';
+import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { UsersService } from 'src/users/users.service';
 import { VerificationTokenPayload } from './dto/VerificationTokenPayload.dto';
 
@@ -13,6 +14,7 @@ export class EmailConfirmationService {
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
     private readonly usersService: UsersService,
+    private readonly alsProvider: AsyncLocalStorageProvider,
   ) {}
 
   async confirmEmail(email: string) {
@@ -41,7 +43,15 @@ export class EmailConfirmationService {
     }
   }
 
-  public sendVerificationLink(email: string) {
+  public async sendVerificationLink() {
+    const userId = this.alsProvider.get('uId');
+    const user = await this.usersService.findOneById(userId);
+    if (user.isVerified) {
+      throw new BadRequestException('Email already confirmed');
+    }
+
+    const email = user.email;
+
     const payload: VerificationTokenPayload = { email };
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
@@ -57,13 +67,5 @@ export class EmailConfirmationService {
       subject: 'Email confirmation',
       text,
     });
-  }
-
-  public async resendConfirmationLink(userId: number) {
-    const user = await this.usersService.findOneById(userId);
-    if (user.isVerified) {
-      throw new BadRequestException('Email already confirmed');
-    }
-    await this.sendVerificationLink(user.email);
   }
 }

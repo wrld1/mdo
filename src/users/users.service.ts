@@ -32,18 +32,6 @@ export class UsersService {
     type: CompanyTypeEnum,
     userId: number,
   ) {
-    // const hasPermission = await this.aclDataService.checkPermission({
-    //   userId,
-    //   resource: '/:id/assign',
-    //   permission: AclPermission.WRITE,
-    // });
-
-    // if (!hasPermission) {
-    //   throw new ForbiddenException(
-    //     'You do not have permission to assign this resource.',
-    //   );
-    // }
-
     const company = await this.companiesDataService.create({ name, type });
 
     await this.userCompanyDataService.create({ userId, companyId: company.id });

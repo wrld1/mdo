@@ -33,7 +33,7 @@ model User {
   companies UserCompany[]
   isVerified Boolean @default(false) 
   Acl Acl[]
-  hashedRt String? @default("adawdasdasd")
+  hashedRt String? 
 
   @@map("user")
 
