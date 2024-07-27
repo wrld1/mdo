@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 import { Prisma } from '@prisma/client';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { PaginationDto } from './dto/user-company-pagination.dto';
@@ -20,7 +19,6 @@ export class UserCompanyService {
       where = { ...where, type };
     }
 
-    const user = this.alsProvider.get('user');
     // if (user.role === Role.SuperAdmin) {
     // change to permission check
     return this.userCompanyDataService.getAllCompanies(page, limit, where);
