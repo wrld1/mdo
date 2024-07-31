@@ -22,5 +22,5 @@ export class UpdateUserDto {
 
   @IsString()
   @IsOptional()
-  hashedRt?: string;
+  refreshToken?: string;
 }

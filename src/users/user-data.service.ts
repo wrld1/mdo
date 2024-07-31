@@ -15,7 +15,7 @@ export class UserDataService {
       data: { ...data, password: hashedPassword },
     });
 
-    const { password, hashedRt, ...result } = user;
+    const { password, refreshToken, ...result } = user;
     return result;
   }
 

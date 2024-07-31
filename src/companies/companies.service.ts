@@ -22,13 +22,13 @@ export class CompaniesService {
   async update(id: string, data: UpdateCompanyDto) {
     const userId = this.alsProvider.get('uId');
     const isManager = await this.aclDataService.checkPermission(userId, id);
-    if (isManager) {
-      return await this.companiesDataService.update(id, data);
-    } else {
+    if (!isManager) {
       throw new ForbiddenException(
         'User does not have the required permission',
       );
     }
+
+    return await this.companiesDataService.update(id, data);
   }
 
   async delete(id: string) {

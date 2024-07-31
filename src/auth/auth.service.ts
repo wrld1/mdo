@@ -49,11 +49,11 @@ export class AuthService {
   async refreshTokens(userId: number, rt: string): Promise<AuthEntity> {
     const user = await this.usersService.findOneById(userId);
 
-    if (!user || !user.hashedRt) {
+    if (!user || !user.refreshToken) {
       throw new UnauthorizedException('Access Denied');
     }
 
-    const rtMatches = await bcrypt.compare(rt, user.hashedRt);
+    const rtMatches = await bcrypt.compare(rt, user.refreshToken);
     if (!rtMatches) {
       throw new UnauthorizedException('Access Denied');
     }
@@ -61,12 +61,9 @@ export class AuthService {
     return await this.createTokens(user.id);
   }
 
-  async updateRefreshToken(
-    userId: number,
-    refreshToken: string,
-  ): Promise<void> {
-    const hashedRt = await bcrypt.hash(refreshToken, 10);
-    await this.userDataService.update(userId, { hashedRt });
+  async updateRefreshToken(userId: number, rt: string): Promise<void> {
+    const refreshToken = await bcrypt.hash(rt, 10);
+    await this.userDataService.update(userId, { refreshToken });
   }
 
   async createTokens(uId: number): Promise<AuthEntity> {

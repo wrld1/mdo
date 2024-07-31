@@ -33,7 +33,7 @@ model User {
   companies UserCompany[]
   isVerified Boolean @default(false) 
   Acl Acl[]
-  hashedRt String? 
+  refreshToken String? 
 
   @@map("user")
 
@@ -68,6 +68,5 @@ model Acl {
   resource String 
   permission AclPermission
 
-  @@unique([userId, resource])
 }
 

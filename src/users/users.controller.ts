@@ -16,7 +16,6 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Public()
   @Get()
   async getUsers(@Request() req) {
     return this.usersService.findAll();
