@@ -30,6 +30,7 @@
     "@nestjs/devtools-integration": "^0.1.6",
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/mapped-types": "*",
+    "@nestjs/microservices": "^10.3.10",
     "@nestjs/platform-express": "^10.0.0",
     "@prisma/client": "^5.16.1",
     "@types/nodemailer": "^6.4.15",

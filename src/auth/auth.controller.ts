@@ -1,4 +1,13 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  Redirect,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/common/constants/auth.constants';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -34,5 +43,16 @@ export class AuthController {
       secret: jwtConstants.refreshSecret,
     });
     return this.authService.refreshTokens(user.uId, refreshToken);
+  }
+
+  @Get('verify')
+  @Redirect()
+  async verifyEmail(@Query('token') token: string) {
+    const isVerified = await this.authService.verifyEmail(token);
+    if (isVerified) {
+      return { url: '/verification-success', statusCode: 302 };
+    } else {
+      return { url: '/verification-failed', statusCode: 302 };
+    }
   }
 }

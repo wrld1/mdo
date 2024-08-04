@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -11,11 +12,13 @@ import { IUser } from 'src/common/interfaces/user';
 import { UserDataService } from 'src/users/user-data.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthEntity } from './entities/auth.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
+    private readonly configService: ConfigService,
     private jwtService: JwtService,
     private userDataService: UserDataService,
   ) {}
@@ -44,6 +47,31 @@ export class AuthService {
     }
 
     return await this.createTokens(user.id);
+  }
+
+  async verifyEmail(token: string): Promise<boolean> {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
+      });
+      const user = await this.usersService.findOneById(payload.uId);
+
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+
+      if (user.isVerified) {
+        throw new BadRequestException('Email already confirmed');
+      }
+
+      await this.usersService.update(user.id, { isVerified: true });
+      return true;
+    } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+        throw new BadRequestException('Email confirmation token expired');
+      }
+      throw new BadRequestException('Bad confirmation token');
+    }
   }
 
   async refreshTokens(userId: number, rt: string): Promise<AuthEntity> {
