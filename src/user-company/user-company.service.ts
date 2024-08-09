@@ -13,23 +13,17 @@ export class UserCompanyService {
 
   async getAllCompanies(paginationDto: PaginationDto) {
     const { page, limit, type } = paginationDto;
+    const userId = this.alsProvider.get('uId');
 
-    let where: Prisma.CompanyWhereInput = {};
+    let where: Prisma.CompanyWhereInput = {
+      users: {
+        some: { userId },
+      },
+    };
     if (type) {
       where = { ...where, type };
     }
 
-    // if (user.role === Role.SuperAdmin) {
-    // change to permission check
     return this.userCompanyDataService.getAllCompanies(page, limit, where);
-    // } else {
-    //   where = {
-    //     ...where,
-    //     users: {
-    //       some: { userId: user.id },
-    //     },
-    //   };
-    //   return this.userCompanyDataService.getAllCompanies(page, limit, where);
-    // }
   }
 }

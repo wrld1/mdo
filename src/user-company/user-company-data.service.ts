@@ -18,6 +18,7 @@ export class UserCompanyDataService {
       this.prisma.company.findMany({
         skip,
         take: limit,
+        where,
       }),
       this.prisma.company.count({ where }),
     ]);

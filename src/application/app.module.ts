@@ -3,13 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { EmailModule } from 'src/email/email.module';
-
 import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { UserCompanyModule } from 'src/user-company/user-company.module';
 import { UsersModule } from 'src/users/users.module';
 import configuration from '../config/configuration';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -23,7 +21,6 @@ import { AppController } from './app.controller';
     UserCompanyModule,
     AsyncLocalStorageModule,
   ],
-  controllers: [AppController],
 })
 export class AppModule {
   constructor(private readonly alsProvider: AsyncLocalStorageProvider) {}
