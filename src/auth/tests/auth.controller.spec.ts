@@ -8,6 +8,8 @@ import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
+import { Request } from 'express';
+import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -23,7 +25,7 @@ describe('AuthController', () => {
           useValue: {
             register: jest.fn(),
             login: jest.fn(),
-            refreshTokens: jest.fn(),
+            refreshAccessToken: jest.fn(),
             verifyEmail: jest.fn(),
           },
         },
@@ -68,24 +70,57 @@ describe('AuthController', () => {
   });
 
   describe('refresh', () => {
-    it('should call jwtService.verify and authService.refreshTokens with the correct parameters', async () => {
-      const refreshTokenDto: RefreshTokenDto = {
-        refreshToken: 'some-refresh-token',
-      };
-      const user = { uId: 'user-id' };
-      (jwtService.verify as jest.Mock).mockReturnValue(user);
-
-      await authController.refresh(refreshTokenDto);
-
-      expect(jwtService.verify).toHaveBeenCalledWith(
-        refreshTokenDto.refreshToken,
-        {
-          secret: jwtConstants.refreshSecret,
+    it('should call jwtService.verify and authService.refreshAccessToken with the correct parameters', async () => {
+      const req = {
+        cookies: {
+          refreshToken: 'some-refresh-token',
         },
-      );
-      expect(authService.refreshTokens).toHaveBeenCalledWith(
+      } as unknown as Request;
+      const res = {} as any;
+      const user = { uId: 'user-id' };
+
+      jest.spyOn(jwtService, 'verify').mockReturnValue(user);
+
+      jest
+        .spyOn(authService, 'refreshAccessToken')
+        .mockResolvedValue({ accessToken: 'new-access-token' });
+
+      await authController.refresh(req, res);
+
+      expect(jwtService.verify).toHaveBeenCalledWith(req.cookies.refreshToken, {
+        secret: jwtConstants.refreshSecret,
+      });
+      expect(authService.refreshAccessToken).toHaveBeenCalledWith(
         user.uId,
-        refreshTokenDto.refreshToken,
+        req.cookies.refreshToken,
+      );
+    });
+
+    it('should throw an UnauthorizedException if no refresh token is provided', async () => {
+      const req = {
+        cookies: {},
+      } as unknown as Request;
+      const res = {} as any;
+
+      await expect(authController.refresh(req, res)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should throw an UnauthorizedException if the refresh token is invalid', async () => {
+      const req = {
+        cookies: {
+          refreshToken: 'invalid-refresh-token',
+        },
+      } as unknown as Request;
+      const res = {} as any;
+
+      jest.spyOn(jwtService, 'verify').mockImplementation(() => {
+        throw new Error('Invalid token');
+      });
+
+      await expect(authController.refresh(req, res)).rejects.toThrow(
+        UnauthorizedException,
       );
     });
   });

@@ -67,6 +67,5 @@ model Acl {
   user User @relation(fields: [userId], references: [id])
   resource String 
   permission AclPermission
-
 }
 
