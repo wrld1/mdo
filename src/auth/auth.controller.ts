@@ -7,6 +7,9 @@ import {
   Post,
   Query,
   Redirect,
+  Req,
+  Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from 'src/common/constants/auth.constants';
@@ -15,6 +18,7 @@ import { Public } from '../common/decorators/public';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -38,11 +42,21 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Body() { refreshToken }: RefreshTokenDto) {
-    const user = this.jwtService.verify(refreshToken, {
-      secret: jwtConstants.refreshSecret,
-    });
-    return this.authService.refreshTokens(user.uId, refreshToken);
+  async refresh(@Req() req: Request, @Res() res: Response) {
+    const refreshToken = req.cookies['refreshToken'];
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+
+    try {
+      const user = this.jwtService.verify(refreshToken, {
+        secret: jwtConstants.refreshSecret,
+      });
+      return this.authService.refreshAccessToken(user.uId, refreshToken);
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
   }
 
   @Get('verify')

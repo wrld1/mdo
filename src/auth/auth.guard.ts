@@ -30,9 +30,11 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
+
     const token = this.extractTokenFromHeader(request);
+
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('No token provided!');
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -40,10 +42,9 @@ export class AuthGuard implements CanActivate {
       });
 
       request['user'] = payload;
-
       this.alsProvider.set('uId', payload.uId);
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid access token');
     }
     return true;
   }

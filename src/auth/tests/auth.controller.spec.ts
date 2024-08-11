@@ -80,7 +80,7 @@ describe('AuthController', () => {
       expect(jwtService.verify).toHaveBeenCalledWith(
         refreshTokenDto.refreshToken,
         {
-          secret: jwtConstants.refreshSecret, // Ensure this value is defined correctly in the jwtConstants import
+          secret: jwtConstants.refreshSecret,
         },
       );
       expect(authService.refreshTokens).toHaveBeenCalledWith(

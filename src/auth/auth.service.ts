@@ -46,7 +46,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    return await this.createTokens(user.id);
+    const { accessToken, refreshToken } = await this.createTokens(user.id);
+
+    return { userId: user.id, accessToken, refreshToken };
   }
 
   async verifyEmail(token: string): Promise<boolean> {
@@ -74,7 +76,10 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(userId: number, rt: string): Promise<AuthEntity> {
+  async refreshAccessToken(
+    userId: number,
+    rt: string,
+  ): Promise<{ accessToken: string }> {
     const user = await this.usersService.findOneById(userId);
 
     if (!user || !user.refreshToken) {
@@ -86,10 +91,12 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied');
     }
 
-    return await this.createTokens(user.id);
+    const accessToken = this.jwtService.sign({ uId: user.id });
+
+    return { accessToken };
   }
 
-  async updateRefreshToken(userId: number, rt: string): Promise<void> {
+  async generateRefreshToken(userId: number, rt: string): Promise<void> {
     const refreshToken = await bcrypt.hash(rt, 10);
     await this.userDataService.update(userId, { refreshToken });
   }
@@ -98,14 +105,30 @@ export class AuthService {
     const accessToken = this.jwtService.sign({ uId });
     const refreshToken = this.jwtService.sign(
       { uId },
-      { secret: jwtConstants.refreshSecret, expiresIn: '7d' },
+      {
+        secret: jwtConstants.refreshSecret,
+        expiresIn: jwtConstants.refreshExpiresIn,
+      },
     );
 
-    await this.updateRefreshToken(uId, refreshToken);
+    await this.generateRefreshToken(uId, refreshToken);
 
     return {
       accessToken,
       refreshToken,
     };
+  }
+
+  async getUserByRefreshToken(
+    refreshToken: string,
+  ): Promise<{ userId: number } | null> {
+    const users = await this.userDataService.findAll();
+    for (const user of users) {
+      const rtMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+      if (rtMatches) {
+        return { userId: user.id };
+      }
+    }
+    return null;
   }
 }
