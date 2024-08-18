@@ -8,12 +8,14 @@ import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     PrismaModule,
     UsersModule,
     AsyncLocalStorageModule,
+    ConfigModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.accessSecret,
