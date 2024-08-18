@@ -48,7 +48,7 @@ export class AuthService {
 
     const { accessToken, refreshToken } = await this.createTokens(user.id);
 
-    return { userId: user.id, accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
   async verifyEmail(token: string): Promise<boolean> {
