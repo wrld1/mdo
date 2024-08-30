@@ -11,6 +11,8 @@ import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
 import { Public } from 'src/common/decorators/public';
 import { Assign } from './dto/assign.dto';
 import { UsersService } from './users.service';
+import { UserResponseDto } from './dto/user-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('user')
 export class UsersController {
@@ -21,7 +23,15 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Post('/:id/assign')
+  @Get(':id')
+  async getUserById(
+    @Param('id', ParseIntPipe) userId: number,
+  ): Promise<UserResponseDto> {
+    const user = await this.usersService.findOneById(userId);
+    return plainToInstance(UserResponseDto, user);
+  }
+
+  @Post(':id/assign')
   async userAssign(
     @Param('id', ParseIntPipe) id: number,
     @Body() { name, type }: Assign,

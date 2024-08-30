@@ -47,7 +47,7 @@ describe('EmailService', () => {
         EMAIL_USER: 'test@example.com',
         EMAIL_PASSWORD: 'password',
         JWT_VERIFICATION_TOKEN_SECRET: 'secret',
-        FRONTEND_URL: 'http://localhost:3000',
+        FRONTEND_URL: 'http://localhost:3001',
       };
       return config[key];
     });
