@@ -12,10 +12,10 @@ export class EmailController {
     await this.emailService.sendVerificationEmail();
   }
 
-  @Public()
-  @Post('send-reset-password')
-  async sendResetLink(@Body() emailData: { email: string }): Promise<void> {
-    const { email } = emailData;
-    await this.emailService.sendResetPasswordLink(email);
-  }
+  // @Public()
+  // @Post('send-reset-password')
+  // async sendResetLink(@Body() emailData: { email: string }): Promise<void> {
+  //   const { email } = emailData;
+  //   await this.emailService.sendResetPasswordLink(email);
+  // }
 }

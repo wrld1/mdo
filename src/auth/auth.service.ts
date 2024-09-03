@@ -13,6 +13,7 @@ import { UserDataService } from 'src/users/user-data.service';
 import { UsersService } from 'src/users/users.service';
 import { AuthEntity } from './entities/auth.entity';
 import { ConfigService } from '@nestjs/config';
+import EmailService from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -21,13 +22,14 @@ export class AuthService {
     private readonly configService: ConfigService,
     private jwtService: JwtService,
     private userDataService: UserDataService,
+    private emailService: EmailService,
   ) {}
 
   async register(user: IUser): Promise<void> {
     const existingUser = await this.usersService.findOneByEmail(user.email);
 
     if (existingUser) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('Користувач з таким email вже існує');
     }
 
     await this.userDataService.create(user);
@@ -96,7 +98,7 @@ export class AuthService {
     return { accessToken };
   }
 
-  async generateRefreshToken(userId: number, rt: string): Promise<void> {
+  async assignRefreshToken(userId: number, rt: string): Promise<void> {
     const refreshToken = await bcrypt.hash(rt, 10);
     await this.userDataService.update(userId, { refreshToken });
   }
@@ -111,7 +113,7 @@ export class AuthService {
       },
     );
 
-    await this.generateRefreshToken(uId, refreshToken);
+    await this.assignRefreshToken(uId, refreshToken);
 
     return {
       accessToken,
@@ -130,5 +132,50 @@ export class AuthService {
       }
     }
     return null;
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.usersService.findOneByEmail(email);
+
+    if (user) {
+      const forgotPasswordToken = this.jwtService.sign(
+        { uId: user.id },
+        {
+          secret: jwtConstants.resetPasswordSecret,
+          expiresIn: jwtConstants.resetPasswordExpiresIn,
+        },
+      );
+
+      this.emailService.sendResetPasswordLink(email, forgotPasswordToken);
+    }
+
+    return { message: 'Якщо цей користувач існує він отримає email' };
+  }
+
+  async resetPassword(resetToken: string, newPassword: string) {
+    try {
+      const payload = this.jwtService.verify(resetToken, {
+        secret: this.configService.get('JWT_RESET_PASSWORD_TOKEN_SECRET'),
+      });
+
+      if (!payload) {
+        throw new UnauthorizedException('Невірне посилання');
+      }
+
+      const user = await this.usersService.findOneById(payload.uId);
+
+      if (!user) {
+        throw new BadRequestException('Не вдалося оновити пароль');
+      }
+
+      await this.usersService.update(user.id, { password: newPassword });
+    } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+        throw new BadRequestException(
+          'Час дії посилання сплинув. Спробуйте дати запит на відновлення паролю знову',
+        );
+      }
+      throw new BadRequestException('Невірне посилання');
+    }
   }
 }

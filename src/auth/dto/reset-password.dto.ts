@@ -1,17 +1,15 @@
 import {
-  IsBoolean,
   IsEmail,
-  IsOptional,
+  IsNotEmpty,
   IsString,
   Matches,
   MinLength,
 } from 'class-validator';
-import { IUser } from 'src/common/interfaces/user';
 import { passwordRegex } from 'src/common/utils/constants';
 
-export class CreateUserDto implements IUser {
-  @IsEmail()
-  email: string;
+export class ResetPasswordDto {
+  @IsString()
+  resetToken: string;
 
   @IsString()
   @MinLength(8)
@@ -19,9 +17,5 @@ export class CreateUserDto implements IUser {
     message:
       'Пароль має містити щонайменше 1 Велику літеру, 1 цифру and 1 спеціальний символ',
   })
-  password: string;
-
-  @IsBoolean()
-  @IsOptional()
-  isVerified: boolean;
+  newPassword: string;
 }

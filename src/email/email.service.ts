@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { createTransport } from 'nodemailer';
-import * as Mail from 'nodemailer/lib/mailer';
+
+import * as Mail from 'nodemailer';
+import { Transporter } from 'nodemailer';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export default class EmailService {
-  private nodemailerTransport: Mail;
+  private transporter: Transporter;
 
   constructor(
     private readonly configService: ConfigService,
@@ -16,9 +17,10 @@ export default class EmailService {
     private readonly alsProvider: AsyncLocalStorageProvider,
     private readonly usersService: UsersService,
   ) {
-    this.nodemailerTransport = createTransport({
-      service: this.configService.get('EMAIL_SERVICE'),
+    this.transporter = Mail.createTransport({
+      host: this.configService.get('EMAIL_SERVICE'),
       port: Number(this.configService.get('SMTP_PORT')),
+      secure: false,
       auth: {
         user: this.configService.get('EMAIL_USER'),
         pass: this.configService.get('EMAIL_PASSWORD'),
@@ -40,7 +42,7 @@ export default class EmailService {
     try {
       const { email } = await this.usersService.findOneById(userId);
 
-      await this.nodemailerTransport.sendMail({
+      await this.transporter.sendMail({
         to: email,
         subject: 'Verify Your Email',
         html: `
@@ -56,17 +58,20 @@ export default class EmailService {
     }
   }
 
-  public async sendResetPasswordLink(email: string): Promise<void> {
-    const resetPasswordLink = `${this.configService.get('FRONTEND_URL')}/reset-password`;
+  public async sendResetPasswordLink(
+    email: string,
+    token: string,
+  ): Promise<void> {
+    const resetPasswordLink = `${this.configService.get('FRONTEND_URL')}/reset-password?token=${token}`;
 
     try {
-      const success = await this.nodemailerTransport.sendMail({
+      const success = await this.transporter.sendMail({
         to: email,
         from: 'Osbb management system',
-        subject: 'Reset password on Osbb management system',
-        text: 'Reset Password',
-        html: `<b>Seems like you forgot your password, here is the link for the new one: 
-        <a href="${resetPasswordLink}">here</a>
+        subject: 'Відновити пароль на Osbb management system',
+        text: 'Відновлення паролю',
+        html: `<b>Схоже, що ви забули свій пароль, от посилання на його відновлення: 
+        <a href="${resetPasswordLink}">Відновити пароль</a>
         </b>`,
       });
 

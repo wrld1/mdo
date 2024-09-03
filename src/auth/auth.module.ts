@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { ConfigModule } from '@nestjs/config';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
     UsersModule,
     AsyncLocalStorageModule,
     ConfigModule,
+    EmailModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.accessSecret,

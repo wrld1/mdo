@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Query,
   Redirect,
   Req,
@@ -19,6 +20,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Request } from 'express';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -68,5 +71,17 @@ export class AuthController {
     } else {
       return { url: '/verification-failed', statusCode: 302 };
     }
+  }
+
+  @Public()
+  @Post('/forgot-password')
+  async forgotPassword(@Body() { email }: ForgotPasswordDto) {
+    return await this.authService.forgotPassword(email);
+  }
+
+  @Public()
+  @Put('/reset-password')
+  async resetPassword(@Body() { resetToken, newPassword }: ResetPasswordDto) {
+    return this.authService.resetPassword(resetToken, newPassword);
   }
 }
