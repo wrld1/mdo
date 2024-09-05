@@ -7,7 +7,7 @@ import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [ConfigModule, AsyncLocalStorageModule, UsersModule],
+  imports: [ConfigModule, UsersModule],
   providers: [EmailService],
   exports: [EmailService],
   controllers: [EmailController],

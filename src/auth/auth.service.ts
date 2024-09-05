@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -14,6 +15,9 @@ import { UsersService } from 'src/users/users.service';
 import { AuthEntity } from './entities/auth.entity';
 import { ConfigService } from '@nestjs/config';
 import EmailService from 'src/email/email.service';
+import { ChangePasswordDto } from './dto/change-pasword.dto';
+import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
+import { hashPassword } from 'src/common/utils/shared/hashPassword';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +27,7 @@ export class AuthService {
     private jwtService: JwtService,
     private userDataService: UserDataService,
     private emailService: EmailService,
+    private alsProvider: AsyncLocalStorageProvider,
   ) {}
 
   async register(user: IUser): Promise<void> {
@@ -39,43 +44,18 @@ export class AuthService {
     const user = await this.usersService.findOneByEmail(email);
 
     if (!user) {
-      throw new NotFoundException(`No user found for email: ${email}`);
+      throw new NotFoundException(`Невірна пошта або пароль`);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
+      throw new UnauthorizedException('Невірна пошта або пароль');
     }
 
     const { accessToken, refreshToken } = await this.createTokens(user.id);
 
     return { accessToken, refreshToken };
-  }
-
-  async verifyEmail(token: string): Promise<boolean> {
-    try {
-      const payload = this.jwtService.verify(token, {
-        secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
-      });
-      const user = await this.usersService.findOneById(payload.uId);
-
-      if (!user) {
-        throw new BadRequestException('User not found');
-      }
-
-      if (user.isVerified) {
-        throw new BadRequestException('Email already confirmed');
-      }
-
-      await this.usersService.update(user.id, { isVerified: true });
-      return true;
-    } catch (error) {
-      if (error?.name === 'TokenExpiredError') {
-        throw new BadRequestException('Email confirmation token expired');
-      }
-      throw new BadRequestException('Bad confirmation token');
-    }
   }
 
   async refreshAccessToken(
@@ -134,6 +114,31 @@ export class AuthService {
     return null;
   }
 
+  async verifyEmail(token: string): Promise<boolean> {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
+      });
+      const user = await this.usersService.findOneById(payload.uId);
+
+      if (!user) {
+        throw new BadRequestException('Щось пішло не так');
+      }
+
+      if (user.isVerified) {
+        throw new BadRequestException('Email вже підтверджено');
+      }
+
+      await this.usersService.update(user.id, { isVerified: true });
+      return true;
+    } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+        throw new BadRequestException('Посилання вже неактивне');
+      }
+      throw new BadRequestException('Невірне посилання');
+    }
+  }
+
   async forgotPassword(email: string) {
     const user = await this.usersService.findOneByEmail(email);
 
@@ -177,5 +182,48 @@ export class AuthService {
       }
       throw new BadRequestException('Невірне посилання');
     }
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto) {
+    const userId = this.alsProvider.get('uId');
+    const user = await this.usersService.findOneById(userId);
+
+    if (!user) {
+      throw new InternalServerErrorException();
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      changePasswordDto.oldPassword,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Невірний пароль');
+    }
+
+    const hashedPassword = await hashPassword(changePasswordDto.newPassword);
+    await this.usersService.update(userId, { password: hashedPassword });
+  }
+
+  async sendVerificationLink(email: string) {
+    try {
+      const user = await this.usersService.findOneByEmail(email);
+
+      if (user) {
+        const token = this.jwtService.sign(
+          { uId: user.id },
+          {
+            secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
+            expiresIn: '24h',
+          },
+        );
+
+        this.emailService.sendVerificationEmail(email, token);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+
+    return { message: 'Якщо цей користувач існує він отримає email' };
   }
 }

@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Put,
   Query,
@@ -22,6 +23,8 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Request } from 'express';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto } from './dto/change-pasword.dto';
+import { sendVerificationLinkDto } from './dto/send-verification-link.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -34,14 +37,14 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('sign-up')
   async register(@Body() createUserDto: CreateUserDto): Promise<void> {
-    return this.authService.register(createUserDto);
+    return await this.authService.register(createUserDto);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('sign-in')
   async login(@Body() { email, password }: LoginDto) {
-    return this.authService.login(email, password);
+    return await this.authService.login(email, password);
   }
 
   @Post('refresh')
@@ -56,7 +59,7 @@ export class AuthController {
       const user = this.jwtService.verify(refreshToken, {
         secret: jwtConstants.refreshSecret,
       });
-      return this.authService.refreshAccessToken(user.uId, refreshToken);
+      return await this.authService.refreshAccessToken(user.uId, refreshToken);
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
@@ -80,8 +83,18 @@ export class AuthController {
   }
 
   @Public()
-  @Put('/reset-password')
+  @Patch('/reset-password')
   async resetPassword(@Body() { resetToken, newPassword }: ResetPasswordDto) {
-    return this.authService.resetPassword(resetToken, newPassword);
+    return await this.authService.resetPassword(resetToken, newPassword);
+  }
+
+  @Post('/verification-email')
+  async sendVerificationLink(@Body() { email }: sendVerificationLinkDto) {
+    return await this.authService.sendVerificationLink(email);
+  }
+
+  @Patch('/change-password')
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    return await this.authService.changePassword(changePasswordDto);
   }
 }
