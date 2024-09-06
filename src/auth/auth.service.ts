@@ -114,31 +114,6 @@ export class AuthService {
     return null;
   }
 
-  async verifyEmail(token: string): Promise<boolean> {
-    try {
-      const payload = this.jwtService.verify(token, {
-        secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
-      });
-      const user = await this.usersService.findOneById(payload.uId);
-
-      if (!user) {
-        throw new BadRequestException('Щось пішло не так');
-      }
-
-      if (user.isVerified) {
-        throw new BadRequestException('Email вже підтверджено');
-      }
-
-      await this.usersService.update(user.id, { isVerified: true });
-      return true;
-    } catch (error) {
-      if (error?.name === 'TokenExpiredError') {
-        throw new BadRequestException('Посилання вже неактивне');
-      }
-      throw new BadRequestException('Невірне посилання');
-    }
-  }
-
   async forgotPassword(email: string) {
     const user = await this.usersService.findOneByEmail(email);
 
@@ -187,6 +162,8 @@ export class AuthService {
   async changePassword(changePasswordDto: ChangePasswordDto) {
     const userId = this.alsProvider.get('uId');
     const user = await this.usersService.findOneById(userId);
+    console.log('userId data', userId);
+    console.log('user datta', user);
 
     if (!user) {
       throw new InternalServerErrorException();
@@ -201,8 +178,9 @@ export class AuthService {
       throw new UnauthorizedException('Невірний пароль');
     }
 
-    const hashedPassword = await hashPassword(changePasswordDto.newPassword);
-    await this.usersService.update(userId, { password: hashedPassword });
+    await this.usersService.update(userId, {
+      password: changePasswordDto.newPassword,
+    });
   }
 
   async sendVerificationLink(email: string) {
@@ -225,5 +203,35 @@ export class AuthService {
     }
 
     return { message: 'Якщо цей користувач існує він отримає email' };
+  }
+
+  async verifyEmail(token: string): Promise<boolean> {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: this.configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
+      });
+
+      if (!payload) {
+        throw new UnauthorizedException('Невірне посилання');
+      }
+
+      const user = await this.usersService.findOneById(payload.uId);
+
+      if (!user) {
+        throw new BadRequestException('Щось пішло не так');
+      }
+
+      if (user.isVerified) {
+        throw new BadRequestException('Email вже підтверджено');
+      }
+
+      await this.usersService.update(user.id, { isVerified: true });
+      return true;
+    } catch (error) {
+      if (error?.name === 'TokenExpiredError') {
+        throw new BadRequestException('Посилання вже неактивне');
+      }
+      throw new BadRequestException('Невірне посилання');
+    }
   }
 }

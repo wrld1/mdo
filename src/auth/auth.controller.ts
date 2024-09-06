@@ -65,35 +65,29 @@ export class AuthController {
     }
   }
 
-  @Get('verify')
-  @Redirect()
-  async verifyEmail(@Query('token') token: string) {
-    const isVerified = await this.authService.verifyEmail(token);
-    if (isVerified) {
-      return { url: '/verification-success', statusCode: 302 };
-    } else {
-      return { url: '/verification-failed', statusCode: 302 };
-    }
+  @Patch('verify')
+  async verifyEmail(@Body() token: string) {
+    return await this.authService.verifyEmail(token);
   }
 
   @Public()
-  @Post('/forgot-password')
+  @Post('forgot-password')
   async forgotPassword(@Body() { email }: ForgotPasswordDto) {
     return await this.authService.forgotPassword(email);
   }
 
   @Public()
-  @Patch('/reset-password')
+  @Patch('reset-password')
   async resetPassword(@Body() { resetToken, newPassword }: ResetPasswordDto) {
     return await this.authService.resetPassword(resetToken, newPassword);
   }
 
-  @Post('/verification-email')
+  @Post('verification-email')
   async sendVerificationLink(@Body() { email }: sendVerificationLinkDto) {
     return await this.authService.sendVerificationLink(email);
   }
 
-  @Patch('/change-password')
+  @Patch('change-password')
   async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
     return await this.authService.changePassword(changePasswordDto);
   }

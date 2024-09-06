@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { AclDataService } from 'src/acl/acl-data.service';
 import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
-import { roundsOfHashing } from 'src/common/utils/shared/hashPassword';
+import { hashPassword } from 'src/common/utils/shared/hashPassword';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
 import { CompaniesDataService } from './../companies/companies-data.service';
@@ -76,10 +75,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(
-        updateUserDto.password,
-        roundsOfHashing,
-      );
+      updateUserDto.password = await hashPassword(updateUserDto.password);
     }
 
     return await this.userDataService.update(id, updateUserDto);
