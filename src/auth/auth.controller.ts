@@ -25,6 +25,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ChangePasswordDto } from './dto/change-pasword.dto';
 import { sendVerificationLinkDto } from './dto/send-verification-link.dto';
+import { VerifyDto } from './dto/verify-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -66,7 +67,7 @@ export class AuthController {
   }
 
   @Patch('verify')
-  async verifyEmail(@Body() { token }: { token: string }) {
+  async verifyEmail(@Body() { token }: VerifyDto) {
     return await this.authService.verifyEmail(token);
   }
 

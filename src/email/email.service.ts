@@ -2,17 +2,12 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Mail from 'nodemailer';
 import { Transporter } from 'nodemailer';
-import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export default class EmailService {
   private transporter: Transporter;
 
-  constructor(
-    private readonly configService: ConfigService,
-
-    private readonly usersService: UsersService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     this.transporter = Mail.createTransport({
       host: this.configService.get('EMAIL_SERVICE'),
       port: Number(this.configService.get('SMTP_PORT')),

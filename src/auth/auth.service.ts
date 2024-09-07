@@ -162,8 +162,6 @@ export class AuthService {
   async changePassword(changePasswordDto: ChangePasswordDto) {
     const userId = this.alsProvider.get('uId');
     const user = await this.usersService.findOneById(userId);
-    console.log('userId data', userId);
-    console.log('user datta', user);
 
     if (!user) {
       throw new InternalServerErrorException();
