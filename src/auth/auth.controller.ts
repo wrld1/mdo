@@ -66,7 +66,7 @@ export class AuthController {
   }
 
   @Patch('verify')
-  async verifyEmail(@Body() token: string) {
+  async verifyEmail(@Body() { token }: { token: string }) {
     return await this.authService.verifyEmail(token);
   }
 
