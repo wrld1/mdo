@@ -4,10 +4,11 @@ export default () => ({
     host: process.env.DATABASE_HOST,
     port: parseInt(process.env.DATABASE_PORT, 10) || 5432,
   },
-  EMAIL_SERVICE: process.env.EMAIL_SERVICE,
+  EMAIL_HOST: process.env.EMAIL_HOST,
   SMTP_PORT: process.env.SMTP_PORT,
   EMAIL_USER: process.env.EMAIL_USER,
   EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
+  EMAIL_FROM: process.env.EMAIL_FROM,
   JWT_VERIFICATION_TOKEN_SECRET: process.env.JWT_VERIFICATION_TOKEN_SECRET,
   JWT_VERIFICATION_TOKEN_EXPIRATION_TIME:
     process.env.JWT_VERIFICATION_TOKEN_EXPIRATION_TIME,

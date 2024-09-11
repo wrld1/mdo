@@ -1,13 +1,42 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import EmailService from './email.service';
-
 import { EmailController } from './email.controller';
-import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
 import { UsersModule } from 'src/users/users.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
 
 @Module({
-  imports: [ConfigModule, UsersModule],
+  imports: [
+    UsersModule,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => {
+        return {
+          transport: {
+            host: config.get('EMAIL_HOST'),
+            secure: false,
+            auth: {
+              user: config.get('EMAIL_USER'),
+              pass: config.get('EMAIL_PASSWORD'),
+            },
+          },
+          defaults: {
+            from: `"Osbb management system" <${config.get('EMAIL_FROM')}>`,
+          },
+          template: {
+            dir: join(__dirname, 'templates'),
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
+      inject: [ConfigService],
+    }),
+  ],
   providers: [EmailService],
   exports: [EmailService],
   controllers: [EmailController],

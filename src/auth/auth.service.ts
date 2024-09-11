@@ -17,7 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import EmailService from 'src/email/email.service';
 import { ChangePasswordDto } from './dto/change-pasword.dto';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
-import { hashPassword } from 'src/common/utils/shared/hashPassword';
+import { Mail, MailType } from 'src/common/enums/MailType';
 
 @Injectable()
 export class AuthService {
@@ -126,7 +126,9 @@ export class AuthService {
         },
       );
 
-      this.emailService.sendResetPasswordLink(email, forgotPasswordToken);
+      const resetPasswordLink = `${this.configService.get('FRONTEND_URL')}/reset-password?token=${forgotPasswordToken}`;
+
+      this.emailService.sendMail(email, Mail.resetPassword, resetPasswordLink);
     }
 
     return { message: 'Якщо цей користувач існує він отримає email' };
@@ -194,12 +196,13 @@ export class AuthService {
           },
         );
 
-        this.emailService.sendVerificationEmail(email, token);
+        const verificationLink = `${this.configService.get('FRONTEND_URL')}/verify-email?token=${token}`;
+
+        this.emailService.sendMail(email, Mail.verification, verificationLink);
       }
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
-
     return { message: 'Якщо цей користувач існує він отримає email' };
   }
 

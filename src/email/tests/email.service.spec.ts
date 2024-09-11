@@ -42,7 +42,7 @@ describe('EmailService', () => {
 
     jest.spyOn(configService, 'get').mockImplementation((key: string) => {
       const config = {
-        EMAIL_SERVICE: 'gmail',
+        EMAIL_HOST: 'gmail',
         SMTP_PORT: '587',
         EMAIL_USER: 'test@example.com',
         EMAIL_PASSWORD: 'password',
