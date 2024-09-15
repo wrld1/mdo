@@ -1,14 +1,10 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Patch,
   Post,
-  Put,
-  Query,
-  Redirect,
   Req,
   Res,
   UnauthorizedException,
@@ -19,11 +15,9 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Public } from '../common/decorators/public';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Request } from 'express';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ChangePasswordDto } from './dto/change-pasword.dto';
 import { sendVerificationLinkDto } from './dto/send-verification-link.dto';
 import { VerifyDto } from './dto/verify-dto';
 
@@ -48,6 +42,7 @@ export class AuthController {
     return await this.authService.login(email, password);
   }
 
+  @Public()
   @Post('refresh')
   async refresh(@Req() req: Request, @Res() res: Response) {
     const refreshToken = req.cookies['refreshToken'];
@@ -60,7 +55,15 @@ export class AuthController {
       const user = this.jwtService.verify(refreshToken, {
         secret: jwtConstants.refreshSecret,
       });
-      return await this.authService.refreshAccessToken(user.uId, refreshToken);
+      console.log('user in endpoint', user);
+
+      const accessToken = await this.authService.refreshAccessToken(
+        user.uId,
+        refreshToken,
+      );
+      console.log(accessToken);
+
+      return accessToken;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
@@ -86,10 +89,5 @@ export class AuthController {
   @Post('verification-email')
   async sendVerificationLink(@Body() { email }: sendVerificationLinkDto) {
     return await this.authService.sendVerificationLink(email);
-  }
-
-  @Patch('change-password')
-  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
-    return await this.authService.changePassword(changePasswordDto);
   }
 }

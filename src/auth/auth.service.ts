@@ -68,7 +68,8 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied');
     }
 
-    const rtMatches = await bcrypt.compare(rt, user.refreshToken);
+    const rtMatches = rt === user.refreshToken;
+
     if (!rtMatches) {
       throw new UnauthorizedException('Access Denied');
     }
@@ -79,8 +80,7 @@ export class AuthService {
   }
 
   async assignRefreshToken(userId: number, rt: string): Promise<void> {
-    const refreshToken = await bcrypt.hash(rt, 10);
-    await this.userDataService.update(userId, { refreshToken });
+    await this.userDataService.update(userId, { refreshToken: rt });
   }
 
   async createTokens(uId: number): Promise<AuthEntity> {
@@ -232,7 +232,7 @@ export class AuthService {
       if (error?.name === 'TokenExpiredError') {
         throw new BadRequestException('Посилання вже неактивне');
       }
-      throw new BadRequestException('Невірне посилання');
+      throw new BadRequestException(error);
     }
   }
 }

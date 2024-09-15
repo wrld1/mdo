@@ -21,7 +21,7 @@ import { EmailModule } from 'src/email/email.module';
     JwtModule.register({
       global: true,
       secret: jwtConstants.accessSecret,
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: '1m' },
     }),
   ],
   controllers: [AuthController],
