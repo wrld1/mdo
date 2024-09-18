@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Patch,
@@ -43,8 +44,8 @@ export class AuthController {
   }
 
   @Public()
-  @Post('refresh')
-  async refresh(@Req() req: Request, @Res() res: Response) {
+  @Get('refresh')
+  async refresh(@Req() req: Request) {
     const refreshToken = req.cookies['refreshToken'];
 
     if (!refreshToken) {
@@ -55,16 +56,10 @@ export class AuthController {
       const user = this.jwtService.verify(refreshToken, {
         secret: jwtConstants.refreshSecret,
       });
-      console.log('user in endpoint', user);
 
-      const accessToken = await this.authService.refreshAccessToken(
-        user.uId,
-        refreshToken,
-      );
-      console.log(accessToken);
-
-      return accessToken;
+      return await this.authService.refreshAccessToken(user.uId, refreshToken);
     } catch (error) {
+      console.log('error happened in controller', error);
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
