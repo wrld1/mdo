@@ -30,7 +30,10 @@ export class AuthService {
     private alsProvider: AsyncLocalStorageProvider,
   ) {}
 
-  async register(user: IUser): Promise<void> {
+  async register(
+    user: IUser,
+    registrationType: 'company' | 'user',
+  ): Promise<void> {
     const existingUser = await this.usersService.findOneByEmail(user.email);
 
     if (existingUser) {

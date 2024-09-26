@@ -24,6 +24,12 @@ enum AclPermission {
   WRITE
 }
 
+enum CompanyStatus {
+  PENDING
+  PROCESSED
+  BLOCKED
+}
+
 model User {
   id    Int     @default(autoincrement()) @id
   email String  @unique
@@ -43,6 +49,7 @@ model Company {
   id       String    @id @default(uuid())
   name     String
   type     CompanyType
+  status   CompanyStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt 
   users    UserCompany[]

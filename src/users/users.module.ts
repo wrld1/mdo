@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AclModule } from 'src/acl/acl.module';
 import { CompaniesModule } from 'src/companies/companies.module';
 import { PrismaModule } from 'src/prisma/prisma.module';
@@ -13,8 +13,8 @@ import { UsersService } from './users.service';
   exports: [UsersService, UserDataService],
   controllers: [UsersController],
   imports: [
-    CompaniesModule,
-    UserCompanyModule,
+    forwardRef(() => CompaniesModule),
+    forwardRef(() => UserCompanyModule),
     PrismaModule,
     AsyncLocalStorageModule,
     AclModule,

@@ -19,9 +19,15 @@ export class CompaniesService {
     });
   }
 
+  async checkAcl(aclArr: string[]) {
+    // acls = acls from db;
+    // existingAcls = proverit est li v acl v db aclki is aclArr v parametrax, esli da to return true;
+  }
+
   async update(id: string, data: UpdateCompanyDto) {
     const userId = this.alsProvider.get('uId');
     const isManager = await this.aclDataService.checkPermission(userId, id);
+    //visivat checkAcl tut dlya vipolneniya raznoi logiki v zavisimosti ot checkAcl
     if (!isManager) {
       throw new ForbiddenException(
         'User does not have the required permission',

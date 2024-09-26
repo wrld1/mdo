@@ -6,7 +6,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
 import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
-import { AuthGuard } from './auth.guard';
+import { AuthGuard } from '../common/guards/auth.guard';
 import { AuthService } from './auth.service';
 import { ConfigModule } from '@nestjs/config';
 import { EmailModule } from 'src/email/email.module';

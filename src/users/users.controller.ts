@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
 import { Public } from 'src/common/decorators/public';
@@ -13,6 +14,7 @@ import { Assign } from './dto/assign.dto';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
+import { isVerifiedGuard } from 'src/common/guards/isVerified.guard';
 
 @Controller('user')
 export class UsersController {
@@ -31,6 +33,7 @@ export class UsersController {
     return plainToInstance(UserResponseDto, user);
   }
 
+  @UseGuards(isVerifiedGuard)
   @Post(':id/assign')
   async userAssign(
     @Param('id', ParseIntPipe) id: number,
@@ -39,8 +42,8 @@ export class UsersController {
     return this.usersService.assignCompanyToUser(name, type, id);
   }
 
-  @Post('/acl')
-  async createAcl(@Body() createAclDto: CreateAclDto) {
-    return this.usersService.createAcl(createAclDto);
-  }
+  // @Post('/acl')
+  // async createAcl(@Body() createAclDto: CreateAclDto) {
+  //   return this.usersService.createAcl(createAclDto);
+  // }
 }

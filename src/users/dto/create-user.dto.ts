@@ -1,6 +1,7 @@
 import {
   IsBoolean,
   IsEmail,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Matches,
@@ -21,7 +22,7 @@ export class CreateUserDto implements IUser {
   })
   password: string;
 
-  @IsBoolean()
-  @IsOptional()
-  isVerified: boolean;
+  @IsString()
+  @IsNotEmpty()
+  registrationType: 'company' | 'user';
 }
