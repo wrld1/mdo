@@ -18,6 +18,9 @@ import EmailService from 'src/email/email.service';
 import { ChangePasswordDto } from './dto/change-pasword.dto';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { Mail, MailType } from 'src/common/enums/MailType';
+import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { AclDataService } from 'src/acl/acl-data.service';
+import { AclPermission } from 'src/common/enums/Permission';
 
 @Injectable()
 export class AuthService {
@@ -28,11 +31,14 @@ export class AuthService {
     private userDataService: UserDataService,
     private emailService: EmailService,
     private alsProvider: AsyncLocalStorageProvider,
+    private aclDataService: AclDataService,
   ) {}
 
   async register(
     user: IUser,
     registrationType: 'company' | 'user',
+    companyName?: string,
+    companyType?: CompanyTypeEnum,
   ): Promise<void> {
     const existingUser = await this.usersService.findOneByEmail(user.email);
 
@@ -40,7 +46,21 @@ export class AuthService {
       throw new ConflictException('Користувач з таким email вже існує');
     }
 
-    await this.userDataService.create(user);
+    const createdUser = await this.userDataService.create(user);
+
+    if (registrationType === 'company') {
+      const createdCompany = await this.usersService.assignCompanyToUser(
+        companyName,
+        companyType,
+        createdUser.id,
+      );
+
+      const acl = await this.aclDataService.createAcl({
+        userId: createdUser.id,
+        resource: `/companyManagement/${createdCompany.id}`,
+        permission: AclPermission.WRITE,
+      });
+    }
   }
 
   async login(email: string, password: string): Promise<AuthEntity> {

@@ -1,12 +1,14 @@
 import {
-  IsBoolean,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   Matches,
   MinLength,
 } from 'class-validator';
+import { Company, CompanyTypeEnum } from 'src/common/enums/CompanyType';
+import { AclPermission } from 'src/common/enums/Permission';
 import { IUser } from 'src/common/interfaces/user';
 import { passwordRegex } from 'src/common/utils/constants';
 
@@ -25,4 +27,12 @@ export class CreateUserDto implements IUser {
   @IsString()
   @IsNotEmpty()
   registrationType: 'company' | 'user';
+
+  @IsString()
+  @IsOptional()
+  companyName: string;
+
+  @IsEnum(Company)
+  @IsOptional()
+  companyType: CompanyTypeEnum;
 }

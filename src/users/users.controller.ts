@@ -41,9 +41,4 @@ export class UsersController {
   ) {
     return this.usersService.assignCompanyToUser(name, type, id);
   }
-
-  // @Post('/acl')
-  // async createAcl(@Body() createAclDto: CreateAclDto) {
-  //   return this.usersService.createAcl(createAclDto);
-  // }
 }

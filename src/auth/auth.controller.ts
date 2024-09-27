@@ -33,11 +33,14 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('sign-up')
   async register(@Body() createUserDto: CreateUserDto): Promise<void> {
-    const { email, password, registrationType } = createUserDto;
+    const { email, password, registrationType, companyName, companyType } =
+      createUserDto;
 
     return await this.authService.register(
       { email, password },
       registrationType,
+      companyName,
+      companyType,
     );
   }
 
