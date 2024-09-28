@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { AclDataService } from 'src/acl/acl-data.service';
 import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
 import { hashPassword } from 'src/common/utils/shared/hashPassword';
@@ -9,6 +8,7 @@ import { CompaniesDataService } from './../companies/companies-data.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDataService } from './user-data.service';
+import { AclService } from 'src/acl/acl.service';
 
 @Injectable()
 export class UsersService {
@@ -17,7 +17,7 @@ export class UsersService {
     private userCompanyDataService: UserCompanyDataService,
     private userDataService: UserDataService,
     private alsProvider: AsyncLocalStorageProvider,
-    private aclDataService: AclDataService,
+    private aclService: AclService,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -40,7 +40,7 @@ export class UsersService {
   async createAcl(input: CreateAclDto) {
     const { userId, resource, permission } = input;
 
-    const acl = await this.aclDataService.createAcl({
+    const acl = await this.aclService.createAcl({
       userId,
       resource,
       permission,

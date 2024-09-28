@@ -23,36 +23,15 @@ export class AclDataService {
     return acl;
   }
 
-  async checkPermission(userId: number, companyId: string) {
-    const possibleResources = [
-      `/companyManagement/${companyId}`,
-      `/company/${companyId}`,
-    ];
-
-    let isManager: boolean = false;
-
+  async checkPermission(userId: number, resources: string[]) {
     const acl = await this.prisma.acl.findFirst({
       where: {
         userId,
         resource: {
-          in: possibleResources,
+          in: resources,
         },
       },
     });
-
-    if (!acl) {
-      throw new NotFoundException('ACL not found for this user and resource');
-    }
-
-    if (acl.resource === `/companyManagement/${companyId}`) {
-      isManager = true;
-    } else if (acl.resource === `/company/${companyId}`) {
-      isManager = false;
-    } else {
-      throw new ForbiddenException(
-        'User does not have the required permission',
-      );
-    }
-    return isManager;
+    return acl;
   }
 }

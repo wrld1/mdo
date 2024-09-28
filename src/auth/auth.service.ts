@@ -17,10 +17,10 @@ import { ConfigService } from '@nestjs/config';
 import EmailService from 'src/email/email.service';
 import { ChangePasswordDto } from './dto/change-pasword.dto';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
-import { Mail, MailType } from 'src/common/enums/MailType';
+import { Mail } from 'src/common/enums/MailType';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
-import { AclDataService } from 'src/acl/acl-data.service';
 import { AclPermission } from 'src/common/enums/Permission';
+import { AclService } from 'src/acl/acl.service';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +31,7 @@ export class AuthService {
     private userDataService: UserDataService,
     private emailService: EmailService,
     private alsProvider: AsyncLocalStorageProvider,
-    private aclDataService: AclDataService,
+    private aclService: AclService,
   ) {}
 
   async register(
@@ -55,7 +55,7 @@ export class AuthService {
         createdUser.id,
       );
 
-      const acl = await this.aclDataService.createAcl({
+      const acl = await this.aclService.createAcl({
         userId: createdUser.id,
         resource: `/companyManagement/${createdCompany.id}`,
         permission: AclPermission.WRITE,
