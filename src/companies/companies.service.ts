@@ -43,4 +43,8 @@ export class CompaniesService {
   async delete(id: string) {
     return this.companiesDataService.delete(id);
   }
+
+  async deletePendingCompanies() {
+    return await this.companiesDataService.deletePendingCompanies();
+  }
 }

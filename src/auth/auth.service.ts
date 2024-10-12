@@ -15,7 +15,7 @@ import { UsersService } from 'src/users/users.service';
 import { AuthEntity } from './entities/auth.entity';
 import { ConfigService } from '@nestjs/config';
 import EmailService from 'src/email/email.service';
-import { ChangePasswordDto } from './dto/change-pasword.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { Mail } from 'src/common/enums/MailType';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
@@ -36,9 +36,10 @@ export class AuthService {
 
   async register(
     user: IUser,
-    registrationType: 'company' | 'user',
-    companyName?: string,
-    companyType?: CompanyTypeEnum,
+    company?: {
+      code: number;
+      type: CompanyTypeEnum;
+    },
   ): Promise<void> {
     const existingUser = await this.usersService.findOneByEmail(user.email);
 
@@ -48,10 +49,10 @@ export class AuthService {
 
     const createdUser = await this.userDataService.create(user);
 
-    if (registrationType === 'company') {
+    if (company) {
       const createdCompany = await this.usersService.assignCompanyToUser(
-        companyName,
-        companyType,
+        company.code,
+        company.type,
         createdUser.id,
       );
 

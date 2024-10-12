@@ -33,4 +33,9 @@ export class CompaniesController {
   async delete(@Param('id') id: string) {
     return this.companiesService.delete(id);
   }
+
+  @Delete('pending/antispam')
+  async deletePendingAntispamCompanies() {
+    return await this.companiesService.deletePendingCompanies();
+  }
 }

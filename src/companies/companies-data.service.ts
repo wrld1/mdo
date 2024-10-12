@@ -25,4 +25,13 @@ export class CompaniesDataService {
       where: { id },
     });
   }
+
+  async deletePendingCompanies() {
+    const deletedCompanies = await this.prisma.company.deleteMany({
+      where: {
+        status: 'PENDING',
+      },
+    });
+    return deletedCompanies.count;
+  }
 }

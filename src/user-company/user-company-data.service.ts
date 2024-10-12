@@ -8,8 +8,8 @@ export class UserCompanyDataService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getAllCompanies(
-    page: number,
-    limit: number,
+    page: number = 1,
+    limit: number = 10,
     where?: Prisma.CompanyWhereInput,
   ) {
     const skip = (page - 1) * limit;

@@ -27,11 +27,11 @@ export class UsersService {
   }
 
   async assignCompanyToUser(
-    name: string,
+    code: number,
     type: CompanyTypeEnum,
     userId: number,
   ) {
-    const company = await this.companiesDataService.create({ name, type });
+    const company = await this.companiesDataService.create({ code, type });
 
     await this.userCompanyDataService.create({ userId, companyId: company.id });
     return company;

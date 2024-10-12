@@ -10,16 +10,11 @@ import { CreateAclDto } from './dto/create-acl.dto';
 export class AclDataService {
   constructor(private prisma: PrismaService) {}
 
-  async createAcl(input: CreateAclDto) {
-    const { userId, resource, permission } = input;
-
+  async createAcl(data: CreateAclDto) {
     const acl = await this.prisma.acl.create({
-      data: {
-        userId,
-        resource,
-        permission,
-      },
+      data,
     });
+
     return acl;
   }
 
@@ -32,6 +27,7 @@ export class AclDataService {
         },
       },
     });
+
     return acl;
   }
 }

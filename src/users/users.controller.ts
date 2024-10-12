@@ -37,8 +37,8 @@ export class UsersController {
   @Post(':id/assign')
   async userAssign(
     @Param('id', ParseIntPipe) id: number,
-    @Body() { name, type }: Assign,
+    @Body() { code, type }: Assign,
   ) {
-    return this.usersService.assignCompanyToUser(name, type, id);
+    return this.usersService.assignCompanyToUser(code, type, id);
   }
 }
