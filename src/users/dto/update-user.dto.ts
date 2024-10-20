@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEmail,
@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 
 export class UpdateUserDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The email of the user',
     example: 'user@example.com',
     required: false,
@@ -17,7 +17,7 @@ export class UpdateUserDto {
   @IsOptional()
   email?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The password of the user (minimum 8 characters)',
     example: 'Password123!',
     required: false,
@@ -27,7 +27,7 @@ export class UpdateUserDto {
   @IsOptional()
   password?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Indicates whether the user is verified',
     example: true,
     required: false,
@@ -36,7 +36,7 @@ export class UpdateUserDto {
   @IsOptional()
   isVerified?: boolean;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The refresh token for the user',
     example: 'some-refresh-token',
     required: false,

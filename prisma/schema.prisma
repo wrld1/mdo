@@ -67,5 +67,6 @@ enum AclPermission {
 enum CompanyStatus {
   PENDING
   PROCESSED
+  INACTIVE
   BLOCKED
 }

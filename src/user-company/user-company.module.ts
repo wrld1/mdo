@@ -6,6 +6,7 @@ import { UserCompanyController } from './user-company.controller';
 import { UserCompanyService } from './user-company.service';
 import { UsersModule } from 'src/users/users.module';
 import { isVerifiedGuard } from 'src/common/guards/isVerified.guard';
+import { AclModule } from 'src/acl/acl.module';
 
 @Module({
   controllers: [UserCompanyController],
@@ -13,6 +14,7 @@ import { isVerifiedGuard } from 'src/common/guards/isVerified.guard';
   exports: [UserCompanyService, UserCompanyDataService],
   imports: [
     PrismaModule,
+    AclModule,
     AsyncLocalStorageModule,
     forwardRef(() => UsersModule),
   ],

@@ -21,7 +21,15 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { sendVerificationLinkDto } from './dto/send-verification-link.dto';
 import { VerifyDto } from './dto/verify-dto';
+import {
+  ApiBody,
+  ApiCookieAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -31,6 +39,13 @@ export class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register a new user/user with assigned company' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully registered.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
   @Post('sign-up')
   async register(@Body() createUserDto: CreateUserDto): Promise<void> {
     const { email, password, company } = createUserDto;
@@ -41,12 +56,26 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('sign-in')
+  @ApiOperation({ summary: 'Login with email and password' })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully logged in.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async login(@Body() { email, password }: LoginDto) {
     return await this.authService.login(email, password);
   }
 
   @Public()
   @Get('refresh')
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiCookieAuth('refreshToken')
+  @ApiResponse({
+    status: 200,
+    description: 'Access token successfully refreshed.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async refresh(@Req() req: Request) {
     const refreshToken = req.cookies['refreshToken'];
 
@@ -66,24 +95,53 @@ export class AuthController {
     }
   }
 
+  @Public()
   @Patch('verify')
+  @ApiOperation({ summary: 'Verify user email' })
+  @ApiBody({ type: VerifyDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Email successfully verified.',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid token' })
   async verifyEmail(@Body() { token }: VerifyDto) {
     return await this.authService.verifyEmail(token);
   }
 
   @Public()
   @Post('forgot-password')
+  @ApiOperation({ summary: 'Send password reset link' })
+  @ApiBody({ type: ForgotPasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset link successfully sent.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
   async forgotPassword(@Body() { email }: ForgotPasswordDto) {
     return await this.authService.forgotPassword(email);
   }
 
   @Public()
   @Patch('reset-password')
+  @ApiOperation({ summary: 'Reset user password' })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Password successfully reset.',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid reset token' })
   async resetPassword(@Body() { resetToken, newPassword }: ResetPasswordDto) {
     return await this.authService.resetPassword(resetToken, newPassword);
   }
 
   @Post('verification-email')
+  @ApiOperation({ summary: 'Send verification email' })
+  @ApiBody({ type: sendVerificationLinkDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Verification email successfully sent.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
   async sendVerificationLink(@Body() { email }: sendVerificationLinkDto) {
     return await this.authService.sendVerificationLink(email);
   }

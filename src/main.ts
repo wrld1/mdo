@@ -33,6 +33,7 @@ async function bootstrap() {
     .setDescription('System for managing OSBB')
     .setVersion('1.0')
     .addTag('oms')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

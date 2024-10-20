@@ -19,11 +19,6 @@ export class CompaniesService {
     });
   }
 
-  async checkAcl(aclArr: string[]) {
-    // acls = acls from db;
-    // existingAcls = proverit est li v acl v db aclki is aclArr v parametrax, esli da to return true;
-  }
-
   async update(id: string, data: UpdateCompanyDto) {
     const userId = this.alsProvider.get('uId');
 

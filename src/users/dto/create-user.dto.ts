@@ -2,16 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
-  IsEnum,
-  IsNotEmpty,
   IsOptional,
   IsString,
   Matches,
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { Company, CompanyTypeEnum } from 'src/common/enums/CompanyType';
-import { AclPermission } from 'src/common/enums/Permission';
 import { IUser } from 'src/common/interfaces/user';
 import { passwordRegex } from 'src/common/utils/constants';
 import { CreateCompanyDto } from 'src/companies/dto/create-company.dto';
