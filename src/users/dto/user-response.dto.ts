@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
+import { FraudStatus } from '@prisma/client';
+import { AclResponseDto } from 'src/acl/dto/acl-response.dto';
 
 @Exclude()
 export class UserResponseDto {
@@ -16,4 +18,20 @@ export class UserResponseDto {
   })
   @Expose()
   isVerified: boolean;
+
+  @ApiProperty({
+    description: 'User fraud status',
+    enum: FraudStatus,
+    example: FraudStatus.CLEAR,
+  })
+  @Expose()
+  fraudStatus: FraudStatus;
+
+  @ApiProperty({
+    description: 'User access control list',
+    type: [AclResponseDto],
+  })
+  @Expose()
+  @Type(() => AclResponseDto)
+  Acl: AclResponseDto[];
 }

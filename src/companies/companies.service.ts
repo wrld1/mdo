@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { CompaniesDataService } from './companies-data.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -35,7 +39,31 @@ export class CompaniesService {
     return await this.companiesDataService.update(id, data);
   }
 
+  // async findOne(id: string) {
+  //   return await this.companiesDataService.findOne({
+  //     where: { id },
+  //   });
+  // }
+
   async delete(id: string) {
+    const userId = this.alsProvider.get('uId');
+
+    const company = await this.companiesDataService.findOne({
+      where: { id },
+    });
+
+    if (!company) {
+      throw new BadRequestException('Компанія не знайдена');
+    }
+
+    const canDelete = await this.aclService.checkPermission(userId, [`admin`]);
+
+    if (!canDelete) {
+      throw new ForbiddenException(
+        'У користувача немає прав на видалення компанії',
+      );
+    }
+
     return this.companiesDataService.delete(id);
   }
 

@@ -11,6 +11,8 @@ import { jwtConstants } from 'src/common/constants/auth.constants';
 
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { IS_PUBLIC_KEY } from '../decorators/public';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { FraudStatus } from '@prisma/client';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -18,6 +20,7 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private reflector: Reflector,
     private alsProvider: AsyncLocalStorageProvider,
+    private prisma: PrismaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -40,6 +43,17 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.accessSecret,
       });
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.uId },
+        select: { fraudStatus: true },
+      });
+
+      if (user?.fraudStatus === FraudStatus.BLOCKED) {
+        throw new UnauthorizedException(
+          'Акаунт заблоковано через підозрілу активність',
+        );
+      }
 
       request['user'] = payload;
       this.alsProvider.set('uId', payload.uId);

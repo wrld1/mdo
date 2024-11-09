@@ -24,7 +24,12 @@ export class UserDataService {
   }
 
   async findOneById(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        Acl: true,
+      },
+    });
   }
 
   async findOneByEmail(email: string) {

@@ -16,6 +16,7 @@ model User {
   updatedAt    DateTime      @updatedAt
   isVerified   Boolean       @default(false)
   refreshToken String?
+  fraudStatus  FraudStatus   @default(CLEAR)
   Acl          Acl[]
   companies    UserCompany[]
 
@@ -45,6 +46,26 @@ model UserCompany {
   @@unique([userId, companyId])
 }
 
+model Provider {
+  id        Int           @id @default(autoincrement())
+  name      String
+  company   Company[]
+
+  companyProvider CompanyProvider[]
+
+  @@map("provider")
+}
+
+model CompanyProvider {
+  id         Int           @id @default(autoincrement())
+  companyId  String
+  providerId Int
+  provider   Provider      @relation(fields: [providerId], references: [id])
+  company    Company       @relation(fields: [companyId], references: [id])
+
+  @@map("company_provider")
+}
+
 model Acl {
   id         Int           @id @default(autoincrement())
   userId     Int
@@ -68,5 +89,11 @@ enum CompanyStatus {
   PENDING
   PROCESSED
   INACTIVE
+  BLOCKED
+}
+
+enum FraudStatus {
+  CLEAR
+  SUSPENDED
   BLOCKED
 }
