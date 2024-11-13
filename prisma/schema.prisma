@@ -32,6 +32,7 @@ model Company {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   users     UserCompany[]
+  // providers CompanyProvider[]
 
   @@map("company")
 }
@@ -46,25 +47,23 @@ model UserCompany {
   @@unique([userId, companyId])
 }
 
-model Provider {
-  id        Int           @id @default(autoincrement())
-  name      String
-  company   Company[]
+// model Provider {
+//   id        Int           @id @default(autoincrement())
+//   name      String
+//   companies   CompanyProvider[]
 
-  companyProvider CompanyProvider[]
+//   @@map("provider")
+// }
 
-  @@map("provider")
-}
+// model CompanyProvider {
+//   id         Int           @id @default(autoincrement())
+//   companyId  String
+//   providerId Int
+//   provider   Provider      @relation(fields: [providerId], references: [id])
+//   company    Company       @relation(fields: [companyId], references: [id])
 
-model CompanyProvider {
-  id         Int           @id @default(autoincrement())
-  companyId  String
-  providerId Int
-  provider   Provider      @relation(fields: [providerId], references: [id])
-  company    Company       @relation(fields: [companyId], references: [id])
-
-  @@map("company_provider")
-}
+//   @@map("company_provider")
+// }
 
 model Acl {
   id         Int           @id @default(autoincrement())

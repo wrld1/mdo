@@ -6,6 +6,7 @@ import { CompaniesDataService } from './companies-data.service';
 import { CompaniesController } from './companies.controller';
 import { CompaniesService } from './companies.service';
 import { UsersModule } from 'src/users/users.module';
+import { UserCompanyModule } from 'src/user-company/user-company.module';
 
 @Module({
   controllers: [CompaniesController],
@@ -15,6 +16,7 @@ import { UsersModule } from 'src/users/users.module';
     PrismaModule,
     AclModule,
     AsyncLocalStorageModule,
+    UserCompanyModule,
     forwardRef(() => UsersModule),
   ],
 })

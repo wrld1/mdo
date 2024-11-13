@@ -43,4 +43,10 @@ export class UserCompanyDataService {
 
     return userCompany;
   }
+
+  async delete(id: string, tx?: Prisma.TransactionClient) {
+    (tx || this.prisma).userCompany.deleteMany({
+      where: { companyId: id },
+    });
+  }
 }

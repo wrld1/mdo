@@ -6,6 +6,6 @@ import { AclService } from './acl.service';
 @Module({
   imports: [PrismaModule],
   providers: [AclDataService, AclService],
-  exports: [AclService],
+  exports: [AclService, AclDataService],
 })
 export class AclModule {}

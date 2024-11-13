@@ -8,6 +8,9 @@ import { CompaniesDataService } from './companies-data.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { AclService } from 'src/acl/acl.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
+import { AclDataService } from 'src/acl/acl-data.service';
 
 @Injectable()
 export class CompaniesService {
@@ -15,6 +18,9 @@ export class CompaniesService {
     private companiesDataService: CompaniesDataService,
     private aclService: AclService,
     private alsProvider: AsyncLocalStorageProvider,
+    private prisma: PrismaService,
+    private userCompaniesDataService: UserCompanyDataService,
+    private aclDataService: AclDataService,
   ) {}
 
   async create(data: CreateCompanyDto) {
@@ -39,12 +45,6 @@ export class CompaniesService {
     return await this.companiesDataService.update(id, data);
   }
 
-  // async findOne(id: string) {
-  //   return await this.companiesDataService.findOne({
-  //     where: { id },
-  //   });
-  // }
-
   async delete(id: string) {
     const userId = this.alsProvider.get('uId');
 
@@ -64,7 +64,11 @@ export class CompaniesService {
       );
     }
 
-    return this.companiesDataService.delete(id);
+    this.prisma.$transaction(async (tx) => {
+      await this.aclDataService.deleteAclEntries(id, tx);
+      await this.userCompaniesDataService.delete(id, tx);
+      await this.companiesDataService.delete(id, tx);
+    });
   }
 
   async deletePendingCompanies() {

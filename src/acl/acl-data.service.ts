@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAclDto } from './dto/create-acl.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AclDataService {
@@ -29,5 +30,16 @@ export class AclDataService {
     });
 
     return acl;
+  }
+
+  async deleteAclEntries(id: string, tx?: Prisma.TransactionClient) {
+    (tx || this.prisma).acl.deleteMany({
+      where: {
+        OR: [
+          { resource: `/companyManagement/${id}` },
+          { resource: `/company/${id}` },
+        ],
+      },
+    });
   }
 }
