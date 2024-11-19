@@ -17,8 +17,10 @@ model User {
   isVerified   Boolean       @default(false)
   refreshToken String?
   fraudStatus  FraudStatus   @default(CLEAR)
+  metadata     Json          @db.JsonB
   Acl          Acl[]
   companies    UserCompany[]
+  ObjectUser   ObjectUser[]
 
   @@map("user")
 }
@@ -31,8 +33,8 @@ model Company {
   status    CompanyStatus @default(PENDING)
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
+  objects   Object[]
   users     UserCompany[]
-  // providers CompanyProvider[]
 
   @@map("company")
 }
@@ -47,23 +49,34 @@ model UserCompany {
   @@unique([userId, companyId])
 }
 
-// model Provider {
-//   id        Int           @id @default(autoincrement())
-//   name      String
-//   companies   CompanyProvider[]
+model Object {
+  id        String       @id @default(uuid())
+  address   String
+  type      ObjectType
+  users     ObjectUser[]
+  company   Company?     @relation(fields: [companyId], references: [id])
+  companyId String?
+  services  Service[]
+}
 
-//   @@map("provider")
-// }
+model ObjectUser {
+  id       Int    @id @default(autoincrement())
+  userId   Int
+  objectId String
 
-// model CompanyProvider {
-//   id         Int           @id @default(autoincrement())
-//   companyId  String
-//   providerId Int
-//   provider   Provider      @relation(fields: [providerId], references: [id])
-//   company    Company       @relation(fields: [companyId], references: [id])
+  object Object @relation(fields: [objectId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+}
 
-//   @@map("company_provider")
-// }
+model Service {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String
+  price       String
+  logo        String
+  object      Object? @relation(fields: [objectId], references: [id])
+  objectId    String?
+}
 
 model Acl {
   id         Int           @id @default(autoincrement())
@@ -89,6 +102,10 @@ enum CompanyStatus {
   PROCESSED
   INACTIVE
   BLOCKED
+}
+
+enum ObjectType {
+  ApartmentBuilding
 }
 
 enum FraudStatus {
