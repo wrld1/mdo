@@ -8,6 +8,9 @@ import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { UserCompanyModule } from 'src/user-company/user-company.module';
 import { UsersModule } from 'src/users/users.module';
 import configuration from '../config/configuration';
+import { ObjectModule } from 'src/object/object.module';
+import { ObjectUserModule } from 'src/object-user/object-user.module';
+import { ServiceModule } from 'src/service/service.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import configuration from '../config/configuration';
     CompaniesModule,
     UserCompanyModule,
     AsyncLocalStorageModule,
+    ServiceModule,
+    ObjectModule,
+    ObjectUserModule,
   ],
 })
 export class AppModule {

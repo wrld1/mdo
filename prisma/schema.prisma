@@ -17,10 +17,10 @@ model User {
   isVerified   Boolean       @default(false)
   refreshToken String?
   fraudStatus  FraudStatus   @default(CLEAR)
-  metadata     Json          @db.JsonB
+  metadata     Json?         @db.JsonB
   Acl          Acl[]
   companies    UserCompany[]
-  ObjectUser   ObjectUser[]
+  objects      ObjectUser[]
 
   @@map("user")
 }
