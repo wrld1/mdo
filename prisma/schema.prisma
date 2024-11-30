@@ -20,7 +20,7 @@ model User {
   metadata     Json?         @db.JsonB
   Acl          Acl[]
   companies    UserCompany[]
-  objects      ObjectUser[]
+  Dwelling     Dwelling[]
 
   @@map("user")
 }
@@ -50,32 +50,55 @@ model UserCompany {
 }
 
 model Object {
-  id        String       @id @default(uuid())
-  address   String
-  type      ObjectType
-  users     ObjectUser[]
-  company   Company?     @relation(fields: [companyId], references: [id])
+  id      String     @id @default(uuid())
+  address String
+  type    ObjectType
+
+  company   Company?   @relation(fields: [companyId], references: [id])
   companyId String?
   services  Service[]
+  dwelling  Dwelling[]
 }
 
-model ObjectUser {
-  id       Int    @id @default(autoincrement())
-  userId   Int
-  objectId String
+model Dwelling {
+  id       Int  @id @default(autoincrement())
+  number   Int  @unique
+  floor    Int?
+  entrance Int?
 
-  object Object @relation(fields: [objectId], references: [id])
-  user   User   @relation(fields: [userId], references: [id])
+  objectId        String
+  object          Object            @relation(fields: [objectId], references: [id])
+  userId          Int?
+  user            User?             @relation(fields: [userId], references: [id])
+  services        Service[]
+  DwellingService DwellingService[]
+}
+
+model DwellingService {
+  id        Int                   @id @default(autoincrement())
+  status    DwellingServiceStatus
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  amount    Decimal               @default(0)
+
+  dwelling   Dwelling @relation(fields: [dwellingId], references: [id])
+  dwellingId Int
+  service    Service  @relation(fields: [serviceId], references: [id])
+  serviceId  Int
 }
 
 model Service {
-  id          Int     @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   name        String
   description String
   price       String
   logo        String
-  object      Object? @relation(fields: [objectId], references: [id])
-  objectId    String?
+
+  object          Object?           @relation(fields: [objectId], references: [id])
+  objectId        String?
+  Dwelling        Dwelling?         @relation(fields: [dwellingId], references: [id])
+  dwellingId      Int?
+  DwellingService DwellingService[]
 }
 
 model Acl {
@@ -112,4 +135,10 @@ enum FraudStatus {
   CLEAR
   SUSPENDED
   BLOCKED
+}
+
+enum DwellingServiceStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
 }

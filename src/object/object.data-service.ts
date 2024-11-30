@@ -46,7 +46,7 @@ export class ObjectDataService {
     });
   }
 
-  async update(id, data: Prisma.ObjectUpdateInput) {
+  async update(id: string, data: Prisma.ObjectUpdateInput) {
     return this.prisma.object.update({
       where: { id },
       data,

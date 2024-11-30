@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { ObjectType } from '@prisma/client';
 import { CreateObjectDto } from './dto/create-object.dto';
 import { ObjectDataService } from './object.data-service';
 import { UpdateObjectDto } from './dto/update-object.dto';
@@ -40,23 +38,35 @@ export class ObjectService {
     return objects[0];
   }
 
-  async assignUser(objectId: string, userId: number) {
-    const existingAssignment = await this.objectUserDataService.find({
-      where: {
-        objectId,
-        userId,
-      },
-      include: {
-        user: true,
-        object: true,
-      },
+  // async assignUser(objectId: string, userId: number) {
+  //   const existingAssignment = await this.objectUserDataService.find({
+  //     where: {
+  //       objectId,
+  //       userId,
+  //     },
+  //     include: {
+  //       user: true,
+  //       object: true,
+  //     },
+  //   });
+
+  //   if (existingAssignment) {
+  //     return existingAssignment;
+  //   }
+
+  //   return this.objectUserDataService.create(objectId, userId);
+  // }
+
+  async assignCompany(objectId: string, companyId: string) {
+    return this.objectDataService.update(objectId, {
+      company: { connect: { id: companyId } },
     });
+  }
 
-    if (existingAssignment) {
-      return existingAssignment;
-    }
-
-    return this.objectUserDataService.create(objectId, userId);
+  async assignService(objectId: string, serviceId: number) {
+    return this.objectDataService.update(objectId, {
+      services: { connect: { id: serviceId } },
+    });
   }
 
   async update(id: string, data: UpdateObjectDto) {

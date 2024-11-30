@@ -10,5 +10,5 @@ export class CreateObjectDto {
 
   @IsString()
   @IsOptional()
-  companyId?: string;
+  companyId: string;
 }

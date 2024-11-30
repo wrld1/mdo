@@ -6,7 +6,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { Assign } from './dto/assign.dto';
@@ -40,7 +39,7 @@ export class UsersController {
     status: 401,
     description: 'Unauthorized access.',
   })
-  async getUsers(@Request() req) {
+  async getUsers() {
     return this.usersService.findAll();
   }
 

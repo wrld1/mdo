@@ -9,5 +9,6 @@ import { ObjectUserDataService } from './object-user.data-service';
   imports: [PrismaModule, ObjectUserModule],
   controllers: [ObjectUserController],
   providers: [ObjectUserService, ObjectUserDataService],
+  exports: [ObjectUserService, ObjectUserDataService],
 })
 export class ObjectUserModule {}
