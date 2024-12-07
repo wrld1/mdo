@@ -11,11 +11,28 @@ export class ObjectDataService {
       data,
       include: {
         company: true,
-        users: true,
         services: true,
       },
     });
   }
+
+  // async find(params: {
+  //   where?: Prisma.ObjectWhereInput;
+  //   include?: Prisma.ObjectInclude;
+  //   take?: number;
+  //   skip?: number;
+  //   orderBy?: Prisma.ObjectOrderByWithRelationInput;
+  // }) {
+  //   const { where, include, take, skip, orderBy } = params;
+
+  //   return this.prisma.object.findMany({
+  //     where,
+  //     include,
+  //     take,
+  //     skip,
+  //     orderBy,
+  //   });
+  // }
 
   async find(params: {
     where?: Prisma.ObjectWhereInput;
@@ -23,27 +40,20 @@ export class ObjectDataService {
     take?: number;
     skip?: number;
     orderBy?: Prisma.ObjectOrderByWithRelationInput;
+    many?: boolean;
   }) {
-    const { where, include, take, skip, orderBy } = params;
+    const { where, include, many = false, take, skip, orderBy } = params;
 
-    return this.prisma.object.findMany({
-      where,
-      include,
-      take,
-      skip,
-      orderBy,
-    });
-  }
-
-  async findFirst(params: {
-    where: Prisma.ObjectWhereInput;
-    include?: Prisma.ObjectInclude;
-  }) {
-    const { where, include } = params;
-    return this.prisma.object.findFirst({
-      where,
-      include,
-    });
+    if (many) {
+      return this.prisma.object.findMany({
+        where,
+        include,
+        take,
+        skip,
+        orderBy,
+      });
+    }
+    return this.prisma.object.findFirst({ where, include });
   }
 
   async update(id: string, data: Prisma.ObjectUpdateInput) {
@@ -52,7 +62,6 @@ export class ObjectDataService {
       data,
       include: {
         company: true,
-        users: true,
         services: true,
       },
     });

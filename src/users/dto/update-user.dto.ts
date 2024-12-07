@@ -44,4 +44,15 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   refreshToken?: string;
+
+  @ApiPropertyOptional({
+    description: 'The dwelling connection object',
+    required: false,
+  })
+  @IsOptional()
+  dwelling?: {
+    connect: {
+      id: number;
+    };
+  };
 }

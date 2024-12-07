@@ -81,6 +81,28 @@ export class ObjectController {
   //   return this.objectService.assignUser(id, data.userId);
   // }
 
+  @Post(':id/dwelling')
+  @ApiOperation({ summary: 'Assign dwelling to object' })
+  @ApiParam({ name: 'id', description: 'Object ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        dwellingId: { type: 'number', description: 'Dwelling ID to assign' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Dwelling successfully assigned to object',
+  })
+  async assignDwelling(
+    @Param('id') id: string,
+    @Body() data: { dwellingId: number },
+  ) {
+    return this.objectService.assignDwelling(id, data.dwellingId);
+  }
+
   @Patch(':id/company')
   @ApiOperation({ summary: 'Assign company to object' })
   @ApiParam({ name: 'id', description: 'Object ID' })

@@ -4,6 +4,7 @@ import { DwellingServiceService } from './dwelling-service.service';
 
 @Module({
   controllers: [DwellingServiceController],
-  providers: [DwellingServiceService]
+  providers: [DwellingServiceService, DwellingServiceDataService],
+  exports: [DwellingServiceService, DwellingServiceDataService],
 })
 export class DwellingServiceModule {}

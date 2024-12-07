@@ -20,7 +20,7 @@ model User {
   metadata     Json?         @db.JsonB
   Acl          Acl[]
   companies    UserCompany[]
-  Dwelling     Dwelling[]
+  dwelling     Dwelling[]
 
   @@map("user")
 }

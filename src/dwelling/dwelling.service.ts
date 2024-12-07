@@ -6,12 +6,13 @@ import { DwellingDataService } from './dwelling.data-service';
 import { Dwelling } from 'src/common/interfaces/dwelling';
 import { UpdateDwellingDto } from './dto/update-dwelling.dto';
 import { FindDwellingsDto } from './dto/find-dwellings.dto';
+import { UserDataService } from 'src/users/user-data.service';
 
 @Injectable()
 export class DwellingService {
   constructor(
-    private prisma: PrismaService,
     private dwellingDataService: DwellingDataService,
+    private userDataService: UserDataService,
   ) {}
 
   async create(data: CreateDwellingDto): Promise<Dwelling> {
@@ -103,5 +104,11 @@ export class DwellingService {
     }
 
     return this.dwellingDataService.getDwellingServices(dwellingId);
+  }
+
+  async assignUser(dwellingId: number, userId: number) {
+    return this.userDataService.update(userId, {
+      dwelling: { connect: { id: dwellingId } },
+    });
   }
 }

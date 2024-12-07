@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsInt, IsNumberString } from 'class-validator';
+import { IsOptional, IsString, IsInt } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class FindDwellingsDto {

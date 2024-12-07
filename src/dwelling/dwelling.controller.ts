@@ -15,6 +15,7 @@ import { CreateDwellingDto } from './dto/create-dwelling.dto';
 import { AddServiceDto } from './dto/add-service.dto';
 import { FindDwellingsDto } from './dto/find-dwellings.dto';
 import { UpdateDwellingDto } from './dto/update-dwelling.dto';
+import { AssignUserDto } from './dto/assign-user.dto';
 
 @ApiTags('Dwelling')
 @Controller('dwelling')
@@ -80,6 +81,19 @@ export class DwellingController {
     @Body() addServiceDto: AddServiceDto,
   ) {
     return this.dwellingService.addService(id, addServiceDto.serviceId);
+  }
+
+  @Post(':id/user')
+  @ApiOperation({ summary: 'Assign a user to a dwelling' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been assigned to the dwelling.',
+  })
+  async assignUser(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() assignUserDto: AssignUserDto,
+  ) {
+    return this.dwellingService.assignUser(id, assignUserDto.userId);
   }
 
   @Delete(':id/services/:serviceId')

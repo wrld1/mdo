@@ -18,18 +18,19 @@ export class ObjectService {
         company: true,
         services: true,
       },
+      many: true,
     });
   }
 
   async findOne(id: string) {
-    const objects = await this.objectDataService.find({
+    const object = await this.objectDataService.find({
       where: { id },
       include: {
         company: true,
         services: true,
       },
     });
-    return objects[0];
+    return object;
   }
 
   // async assignUser(objectId: string, userId: number) {
@@ -60,6 +61,12 @@ export class ObjectService {
   async assignService(objectId: string, serviceId: number) {
     return this.objectDataService.update(objectId, {
       services: { connect: { id: serviceId } },
+    });
+  }
+
+  async assignDwelling(objectId: string, dwellingId: number) {
+    return this.objectDataService.update(objectId, {
+      dwelling: { connect: { id: dwellingId } },
     });
   }
 

@@ -16,6 +16,7 @@ export class DwellingDataService {
         object: true,
         services: true,
         DwellingService: true,
+        user: true,
       },
     });
   }
@@ -26,6 +27,7 @@ export class DwellingDataService {
       object: true,
       services: true,
       DwellingService: true,
+      user: true,
     };
 
     if (many) {
@@ -42,6 +44,7 @@ export class DwellingDataService {
         object: true,
         services: true,
         DwellingService: true,
+        user: true,
       },
     });
   }
