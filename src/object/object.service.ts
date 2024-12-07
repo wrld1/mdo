@@ -2,14 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { CreateObjectDto } from './dto/create-object.dto';
 import { ObjectDataService } from './object.data-service';
 import { UpdateObjectDto } from './dto/update-object.dto';
-import { ObjectUserDataService } from 'src/object-user/object-user.data-service';
 
 @Injectable()
 export class ObjectService {
-  constructor(
-    private objectDataService: ObjectDataService,
-    private objectUserDataService: ObjectUserDataService,
-  ) {}
+  constructor(private objectDataService: ObjectDataService) {}
 
   async create(data: CreateObjectDto) {
     return this.objectDataService.create(data);
@@ -20,7 +16,6 @@ export class ObjectService {
       where: companyId ? { companyId } : undefined,
       include: {
         company: true,
-        users: true,
         services: true,
       },
     });
@@ -31,7 +26,6 @@ export class ObjectService {
       where: { id },
       include: {
         company: true,
-        users: true,
         services: true,
       },
     });

@@ -67,7 +67,7 @@ model Dwelling {
   entrance Int?
 
   objectId        String
-  object          Object            @relation(fields: [objectId], references: [id])
+  object          Object            @relation(fields: [objectId], references: [id], onDelete: Cascade)
   userId          Int?
   user            User?             @relation(fields: [userId], references: [id])
   services        Service[]
@@ -81,7 +81,7 @@ model DwellingService {
   updatedAt DateTime              @updatedAt
   amount    Decimal               @default(0)
 
-  dwelling   Dwelling @relation(fields: [dwellingId], references: [id])
+  dwelling   Dwelling @relation(fields: [dwellingId], references: [id], onDelete: Cascade)
   dwellingId Int
   service    Service  @relation(fields: [serviceId], references: [id])
   serviceId  Int
@@ -96,7 +96,7 @@ model Service {
 
   object          Object?           @relation(fields: [objectId], references: [id])
   objectId        String?
-  Dwelling        Dwelling?         @relation(fields: [dwellingId], references: [id])
+  dwelling        Dwelling?         @relation(fields: [dwellingId], references: [id])
   dwellingId      Int?
   DwellingService DwellingService[]
 }

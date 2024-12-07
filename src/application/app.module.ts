@@ -9,8 +9,8 @@ import { UserCompanyModule } from 'src/user-company/user-company.module';
 import { UsersModule } from 'src/users/users.module';
 import configuration from '../config/configuration';
 import { ObjectModule } from 'src/object/object.module';
-import { ObjectUserModule } from 'src/object-user/object-user.module';
 import { ServiceModule } from 'src/service/service.module';
+import { DwellingModule } from 'src/dwelling/dwelling.module';
 
 @Module({
   imports: [
@@ -25,7 +25,7 @@ import { ServiceModule } from 'src/service/service.module';
     AsyncLocalStorageModule,
     ServiceModule,
     ObjectModule,
-    ObjectUserModule,
+    DwellingModule,
   ],
 })
 export class AppModule {

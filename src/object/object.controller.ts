@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ObjectService } from './object.service';
 import { CreateObjectDto } from './dto/create-object.dto';
-import { AssignUserToObjectDto } from './dto/assign-user-to-object.dto';
 import { UpdateObjectDto } from './dto/update-object.dto';
 import {
   ApiTags,

@@ -3,10 +3,9 @@ import { ObjectService } from './object.service';
 import { ObjectController } from './object.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { ObjectDataService } from './object.data-service';
-import { ObjectUserModule } from 'src/object-user/object-user.module';
 
 @Module({
-  imports: [PrismaModule, ObjectUserModule],
+  imports: [PrismaModule],
   providers: [ObjectService, ObjectDataService],
   exports: [ObjectService],
   controllers: [ObjectController],
