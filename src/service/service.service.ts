@@ -8,11 +8,11 @@ export class ServiceService {
   constructor(private serviceDataService: ServiceDataService) {}
 
   async create(data: CreateServiceDto) {
-    return this.serviceDataService.create(data);
+    return await this.serviceDataService.create(data);
   }
 
   async findAll(objectId?: string) {
-    return this.serviceDataService.find({
+    return await this.serviceDataService.find({
       where: objectId ? { objectId } : undefined,
       include: { object: true },
     });
@@ -27,10 +27,10 @@ export class ServiceService {
   }
 
   async update(id: number, data: UpdateServiceDto) {
-    return this.serviceDataService.update(id, data);
+    return await this.serviceDataService.update(id, data);
   }
 
   async remove(id: number) {
-    return this.serviceDataService.delete(id);
+    return await this.serviceDataService.delete(id);
   }
 }

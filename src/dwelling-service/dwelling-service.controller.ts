@@ -17,16 +17,6 @@ export class DwellingServiceController {
     private readonly dwellingServiceService: DwellingServiceService,
   ) {}
 
-  @Get('dwelling/:dwellingId')
-  @ApiOperation({ summary: 'Find all services for a specific dwelling' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns list of dwelling services',
-  })
-  findByDwelling(@Param('dwellingId', ParseIntPipe) dwellingId: number) {
-    return this.dwellingServiceService.findByDwelling(dwellingId);
-  }
-
   @Patch(':id/status')
   @ApiOperation({ summary: 'Update dwelling service status' })
   @ApiResponse({
@@ -34,10 +24,24 @@ export class DwellingServiceController {
     description: 'Dwelling service status successfully updated',
   })
   @ApiResponse({ status: 404, description: 'Dwelling service not found' })
-  updateStatus(
+  async updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body('status') status: DwellingServiceStatus,
   ) {
-    return this.dwellingServiceService.updateStatus(id, status);
+    return await this.dwellingServiceService.updateStatus(id, status);
+  }
+
+  @Patch(':id/amount')
+  @ApiOperation({ summary: 'Update dwelling service amount' })
+  @ApiResponse({
+    status: 200,
+    description: 'Dwelling service amount successfully updated',
+  })
+  @ApiResponse({ status: 404, description: 'Dwelling service not found' })
+  async updateAmount(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('amount') amount: number,
+  ) {
+    return await this.dwellingServiceService.updateAmount(id, amount);
   }
 }

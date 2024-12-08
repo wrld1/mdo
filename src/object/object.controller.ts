@@ -30,7 +30,7 @@ export class ObjectController {
   @ApiBody({ type: CreateObjectDto })
   @ApiResponse({ status: 201, description: 'Object successfully created' })
   async create(@Body() data: CreateObjectDto) {
-    return this.objectService.create(data);
+    return await this.objectService.create(data);
   }
 
   @Get()
@@ -45,7 +45,7 @@ export class ObjectController {
     description: 'List of objects retrieved successfully',
   })
   async findAll(@Query('companyId') companyId?: string) {
-    return this.objectService.findAll(companyId);
+    return await this.objectService.findAll(companyId);
   }
 
   @Get(':id')
@@ -54,7 +54,7 @@ export class ObjectController {
   @ApiResponse({ status: 200, description: 'Object retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Object not found' })
   async findOne(@Param('id') id: string) {
-    return this.objectService.findOne(id);
+    return await this.objectService.findOne(id);
   }
 
   @Patch(':id')
@@ -63,23 +63,8 @@ export class ObjectController {
   @ApiBody({ type: UpdateObjectDto })
   @ApiResponse({ status: 200, description: 'Object updated successfully' })
   async update(@Param('id') id: string, @Body() data: UpdateObjectDto) {
-    return this.objectService.update(id, data);
+    return await this.objectService.update(id, data);
   }
-
-  // @Post(':id/users')
-  // @ApiOperation({ summary: 'Assign user to object' })
-  // @ApiParam({ name: 'id', description: 'Object ID' })
-  // @ApiBody({ type: AssignUserToObjectDto })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'User successfully assigned to object',
-  // })
-  // async assignUser(
-  //   @Param('id') id: string,
-  //   @Body() data: AssignUserToObjectDto,
-  // ) {
-  //   return this.objectService.assignUser(id, data.userId);
-  // }
 
   @Post(':id/dwelling')
   @ApiOperation({ summary: 'Assign dwelling to object' })
@@ -100,7 +85,7 @@ export class ObjectController {
     @Param('id') id: string,
     @Body() data: { dwellingId: number },
   ) {
-    return this.objectService.assignDwelling(id, data.dwellingId);
+    return await this.objectService.assignDwelling(id, data.dwellingId);
   }
 
   @Patch(':id/company')
@@ -122,7 +107,7 @@ export class ObjectController {
     @Param('id') id: string,
     @Body() data: { companyId: string },
   ) {
-    return this.objectService.assignCompany(id, data.companyId);
+    return await this.objectService.assignCompany(id, data.companyId);
   }
 
   @Patch(':id/service')
@@ -144,7 +129,7 @@ export class ObjectController {
     @Param('id') id: string,
     @Body() data: { serviceId: number },
   ) {
-    return this.objectService.assignService(id, data.serviceId);
+    return await this.objectService.assignService(id, data.serviceId);
   }
 
   @Delete(':id')
@@ -153,6 +138,6 @@ export class ObjectController {
   @ApiResponse({ status: 200, description: 'Object deleted successfully' })
   @ApiResponse({ status: 404, description: 'Object not found' })
   async remove(@Param('id') id: string) {
-    return this.objectService.remove(id);
+    return await this.objectService.remove(id);
   }
 }

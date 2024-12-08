@@ -30,7 +30,7 @@ export class ServiceController {
   @ApiBody({ type: CreateServiceDto })
   @ApiResponse({ status: 201, description: 'Service successfully created' })
   async create(@Body() data: CreateServiceDto) {
-    return this.serviceService.create(data);
+    return await this.serviceService.create(data);
   }
 
   @Get()
@@ -45,7 +45,7 @@ export class ServiceController {
     description: 'List of services retrieved successfully',
   })
   async findAll(@Query('objectId') objectId?: string) {
-    return this.serviceService.findAll(objectId);
+    return await this.serviceService.findAll(objectId);
   }
 
   @Get(':id')
@@ -58,7 +58,7 @@ export class ServiceController {
   @ApiResponse({ status: 200, description: 'Service retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Service not found' })
   async findOne(@Param('id') id: number) {
-    return this.serviceService.findOne(id);
+    return await this.serviceService.findOne(id);
   }
 
   @Patch(':id')
@@ -72,7 +72,7 @@ export class ServiceController {
   @ApiResponse({ status: 200, description: 'Service updated successfully' })
   @ApiResponse({ status: 404, description: 'Service not found' })
   async update(@Param('id') id: number, @Body() data: UpdateServiceDto) {
-    return this.serviceService.update(id, data);
+    return await this.serviceService.update(id, data);
   }
 
   @Delete(':id')
@@ -85,6 +85,6 @@ export class ServiceController {
   @ApiResponse({ status: 200, description: 'Service deleted successfully' })
   @ApiResponse({ status: 404, description: 'Service not found' })
   async remove(@Param('id') id: number) {
-    return this.serviceService.remove(id);
+    return await this.serviceService.remove(id);
   }
 }

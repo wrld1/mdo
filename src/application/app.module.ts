@@ -11,6 +11,7 @@ import configuration from '../config/configuration';
 import { ObjectModule } from 'src/object/object.module';
 import { ServiceModule } from 'src/service/service.module';
 import { DwellingModule } from 'src/dwelling/dwelling.module';
+import { DwellingServiceModule } from 'src/dwelling-service/dwelling-service.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { DwellingModule } from 'src/dwelling/dwelling.module';
     ServiceModule,
     ObjectModule,
     DwellingModule,
+    DwellingServiceModule,
   ],
 })
 export class AppModule {

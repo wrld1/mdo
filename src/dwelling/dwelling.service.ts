@@ -7,21 +7,23 @@ import { Dwelling } from 'src/common/interfaces/dwelling';
 import { UpdateDwellingDto } from './dto/update-dwelling.dto';
 import { FindDwellingsDto } from './dto/find-dwellings.dto';
 import { UserDataService } from 'src/users/user-data.service';
+import { DwellingServiceDataService } from 'src/dwelling-service/dwelling-service.data-service';
 
 @Injectable()
 export class DwellingService {
   constructor(
     private dwellingDataService: DwellingDataService,
     private userDataService: UserDataService,
+    private dwellingServiceDataService: DwellingServiceDataService,
   ) {}
 
   async create(data: CreateDwellingDto): Promise<Dwelling> {
-    return this.dwellingDataService.create(data);
+    return await this.dwellingDataService.create(data);
   }
 
   async findAll(params: FindDwellingsDto) {
     const { objectId, floor, entrance } = params;
-    return this.dwellingDataService.find({
+    return await this.dwellingDataService.find({
       where: { objectId, floor, entrance },
       many: true,
     });
@@ -69,7 +71,10 @@ export class DwellingService {
         throw new NotFoundException(`Квартиру не знайдено`);
       }
 
-      return await this.dwellingDataService.addService(dwellingId, serviceId);
+      return await this.dwellingServiceDataService.addService(
+        dwellingId,
+        serviceId,
+      );
     } catch (error) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`Сервіс не знайдено`);
@@ -85,7 +90,7 @@ export class DwellingService {
         throw new NotFoundException(`Квартиру не знайдено`);
       }
 
-      return await this.dwellingDataService.removeService(
+      return await this.dwellingServiceDataService.removeService(
         dwellingId,
         serviceId,
       );
@@ -103,11 +108,13 @@ export class DwellingService {
       throw new NotFoundException(`Квартиру не знайдено`);
     }
 
-    return this.dwellingDataService.getDwellingServices(dwellingId);
+    return await this.dwellingServiceDataService.getDwellingServices(
+      dwellingId,
+    );
   }
 
   async assignUser(dwellingId: number, userId: number) {
-    return this.userDataService.update(userId, {
+    return await this.userDataService.update(userId, {
       dwelling: { connect: { id: dwellingId } },
     });
   }

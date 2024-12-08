@@ -26,21 +26,21 @@ export class DwellingController {
   @ApiOperation({ summary: 'Create a new dwelling' })
   @ApiResponse({ status: 201, description: 'The dwelling has been created.' })
   async create(@Body() data: CreateDwellingDto) {
-    return this.dwellingService.create(data);
+    return await this.dwellingService.create(data);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all dwellings' })
   @ApiResponse({ status: 200, description: 'Return all dwellings.' })
   async findAll(@Query() query: FindDwellingsDto) {
-    return this.dwellingService.findAll(query);
+    return await this.dwellingService.findAll(query);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a dwelling by id' })
   @ApiResponse({ status: 200, description: 'Return the dwelling.' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.dwellingService.findOne(id);
+    return await this.dwellingService.findOne(id);
   }
 
   @Patch(':id')
@@ -50,14 +50,14 @@ export class DwellingController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDwellingDto: UpdateDwellingDto,
   ) {
-    return this.dwellingService.update(id, updateDwellingDto);
+    return await this.dwellingService.update(id, updateDwellingDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a dwelling' })
   @ApiResponse({ status: 200, description: 'The dwelling has been deleted.' })
   async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.dwellingService.remove(id);
+    return await this.dwellingService.remove(id);
   }
 
   @Get(':id/services')
@@ -67,7 +67,7 @@ export class DwellingController {
     description: 'Return all services for the dwelling.',
   })
   async getDwellingServices(@Param('id', ParseIntPipe) id: number) {
-    return this.dwellingService.getDwellingServices(id);
+    return await this.dwellingService.getDwellingServices(id);
   }
 
   @Post(':id/services')
@@ -80,7 +80,7 @@ export class DwellingController {
     @Param('id', ParseIntPipe) id: number,
     @Body() addServiceDto: AddServiceDto,
   ) {
-    return this.dwellingService.addService(id, addServiceDto.serviceId);
+    return await this.dwellingService.addService(id, addServiceDto.serviceId);
   }
 
   @Post(':id/user')
@@ -93,7 +93,7 @@ export class DwellingController {
     @Param('id', ParseIntPipe) id: number,
     @Body() assignUserDto: AssignUserDto,
   ) {
-    return this.dwellingService.assignUser(id, assignUserDto.userId);
+    return await this.dwellingService.assignUser(id, assignUserDto.userId);
   }
 
   @Delete(':id/services/:serviceId')
@@ -106,6 +106,6 @@ export class DwellingController {
     @Param('id', ParseIntPipe) id: number,
     @Param('serviceId', ParseIntPipe) serviceId: number,
   ) {
-    return this.dwellingService.removeService(id, serviceId);
+    return await this.dwellingService.removeService(id, serviceId);
   }
 }

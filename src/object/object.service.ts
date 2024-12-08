@@ -8,7 +8,7 @@ export class ObjectService {
   constructor(private objectDataService: ObjectDataService) {}
 
   async create(data: CreateObjectDto) {
-    return this.objectDataService.create(data);
+    return await this.objectDataService.create(data);
   }
 
   async findAll(companyId?: string) {
@@ -30,27 +30,8 @@ export class ObjectService {
         services: true,
       },
     });
-    return object;
+    return await object;
   }
-
-  // async assignUser(objectId: string, userId: number) {
-  //   const existingAssignment = await this.objectUserDataService.find({
-  //     where: {
-  //       objectId,
-  //       userId,
-  //     },
-  //     include: {
-  //       user: true,
-  //       object: true,
-  //     },
-  //   });
-
-  //   if (existingAssignment) {
-  //     return existingAssignment;
-  //   }
-
-  //   return this.objectUserDataService.create(objectId, userId);
-  // }
 
   async assignCompany(objectId: string, companyId: string) {
     return this.objectDataService.update(objectId, {
@@ -71,10 +52,10 @@ export class ObjectService {
   }
 
   async update(id: string, data: UpdateObjectDto) {
-    return this.objectDataService.update(id, data);
+    return await this.objectDataService.update(id, data);
   }
 
   async remove(id: string) {
-    return this.objectDataService.delete({ id });
+    return await this.objectDataService.delete({ id });
   }
 }

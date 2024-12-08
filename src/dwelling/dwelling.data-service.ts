@@ -54,38 +54,4 @@ export class DwellingDataService {
       where: { id },
     });
   }
-
-  async addService(dwellingId: number, serviceId: number) {
-    return this.prisma.dwellingService.create({
-      data: {
-        dwelling: { connect: { id: dwellingId } },
-        service: { connect: { id: serviceId } },
-        status: 'ACTIVE',
-      },
-      include: {
-        dwelling: true,
-        service: true,
-      },
-    });
-  }
-
-  async removeService(dwellingId: number, serviceId: number) {
-    return this.prisma.dwellingService.deleteMany({
-      where: {
-        dwellingId,
-        serviceId,
-      },
-    });
-  }
-
-  async getDwellingServices(dwellingId: number) {
-    return this.prisma.dwellingService.findMany({
-      where: {
-        dwellingId,
-      },
-      include: {
-        service: true,
-      },
-    });
-  }
 }
