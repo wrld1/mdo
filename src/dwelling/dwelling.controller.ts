@@ -12,16 +12,16 @@ import {
 import { DwellingService } from './dwelling.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateDwellingDto } from './dto/create-dwelling.dto';
-import { AddServiceDto } from './dto/add-service.dto';
 import { FindDwellingsDto } from './dto/find-dwellings.dto';
 import { UpdateDwellingDto } from './dto/update-dwelling.dto';
-import { AssignUserDto } from './dto/assign-user.dto';
+import { PaginationParamsDto } from './dto/pagination-params.dto';
 
 @ApiTags('Dwelling')
 @Controller('dwelling')
 export class DwellingController {
   constructor(private readonly dwellingService: DwellingService) {}
 
+  // при создани двеллинга, я сразу создаю и двеллингСервис и ассайню туда сервисы которые уже есть в обьекте и активны
   @Post()
   @ApiOperation({ summary: 'Create a new dwelling' })
   @ApiResponse({ status: 201, description: 'The dwelling has been created.' })
@@ -31,9 +31,15 @@ export class DwellingController {
 
   @Get()
   @ApiOperation({ summary: 'Get all dwellings' })
-  @ApiResponse({ status: 200, description: 'Return all dwellings.' })
-  async findAll(@Query() query: FindDwellingsDto) {
-    return await this.dwellingService.findAll(query);
+  @ApiResponse({
+    status: 200,
+    description: 'Return paginated, sorted, and filtered list of dwellings.',
+  })
+  async findAll(
+    @Query() query: FindDwellingsDto,
+    @Query() paginationQuery: PaginationParamsDto,
+  ) {
+    return await this.dwellingService.findAll(query, paginationQuery);
   }
 
   @Get(':id')
@@ -43,6 +49,7 @@ export class DwellingController {
     return await this.dwellingService.findOne(id);
   }
 
+  //add acl check(admin & manager)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a dwelling' })
   @ApiResponse({ status: 200, description: 'The dwelling has been updated.' })
@@ -50,9 +57,14 @@ export class DwellingController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDwellingDto: UpdateDwellingDto,
   ) {
+    if (updateDwellingDto.userId) {
+      await this.dwellingService.assignUser(id, updateDwellingDto.userId);
+    }
+
     return await this.dwellingService.update(id, updateDwellingDto);
   }
 
+  //add acl check(admin & manager)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a dwelling' })
   @ApiResponse({ status: 200, description: 'The dwelling has been deleted.' })
@@ -68,44 +80,5 @@ export class DwellingController {
   })
   async getDwellingServices(@Param('id', ParseIntPipe) id: number) {
     return await this.dwellingService.getDwellingServices(id);
-  }
-
-  @Post(':id/services')
-  @ApiOperation({ summary: 'Add a service to a dwelling' })
-  @ApiResponse({
-    status: 201,
-    description: 'The service has been added to the dwelling.',
-  })
-  async addService(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() addServiceDto: AddServiceDto,
-  ) {
-    return await this.dwellingService.addService(id, addServiceDto.serviceId);
-  }
-
-  @Post(':id/user')
-  @ApiOperation({ summary: 'Assign a user to a dwelling' })
-  @ApiResponse({
-    status: 200,
-    description: 'The user has been assigned to the dwelling.',
-  })
-  async assignUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() assignUserDto: AssignUserDto,
-  ) {
-    return await this.dwellingService.assignUser(id, assignUserDto.userId);
-  }
-
-  @Delete(':id/services/:serviceId')
-  @ApiOperation({ summary: 'Remove a service from a dwelling' })
-  @ApiResponse({
-    status: 200,
-    description: 'The service has been removed from the dwelling.',
-  })
-  async removeService(
-    @Param('id', ParseIntPipe) id: number,
-    @Param('serviceId', ParseIntPipe) serviceId: number,
-  ) {
-    return await this.dwellingService.removeService(id, serviceId);
   }
 }

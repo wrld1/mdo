@@ -54,9 +54,6 @@ export class UserCompanyController {
     description: 'Companies not found',
   })
   async getCompanies(@Query() paginationDto: PaginationDto) {
-    const result = await this.userCompanyService.getCompanies(paginationDto);
-
-    console.log(result);
-    return result;
+    return await this.userCompanyService.getCompanies(paginationDto);
   }
 }

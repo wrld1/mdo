@@ -21,8 +21,16 @@ export class DwellingDataService {
     });
   }
 
-  async find(params: { where: Prisma.DwellingWhereInput; many?: boolean }) {
-    const { where, many = false } = params;
+  async find(
+    params: {
+      where: Prisma.DwellingWhereInput;
+      skip?: number;
+      take?: number;
+      orderBy?: Prisma.DwellingOrderByWithRelationInput;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const { where, skip, take, orderBy } = params;
     const include = {
       object: true,
       services: true,
@@ -30,10 +38,21 @@ export class DwellingDataService {
       user: true,
     };
 
-    if (many) {
-      return this.prisma.dwelling.findMany({ where, include });
-    }
-    return this.prisma.dwelling.findFirst({ where, include });
+    return (tx || this.prisma).dwelling.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include,
+    });
+  }
+
+  async count(
+    params: { where: Prisma.DwellingWhereInput },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const { where } = params;
+    return (tx || this.prisma).dwelling.count({ where });
   }
 
   async update(id: number, data: UpdateDwellingDto) {

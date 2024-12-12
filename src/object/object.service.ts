@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateObjectDto } from './dto/create-object.dto';
 import { ObjectDataService } from './object.data-service';
 import { UpdateObjectDto } from './dto/update-object.dto';
@@ -30,7 +30,12 @@ export class ObjectService {
         services: true,
       },
     });
-    return await object;
+
+    if (!object) {
+      throw new NotFoundException("Об'єкт не знайдено");
+    }
+
+    return object;
   }
 
   async assignCompany(objectId: string, companyId: string) {
@@ -42,12 +47,6 @@ export class ObjectService {
   async assignService(objectId: string, serviceId: number) {
     return this.objectDataService.update(objectId, {
       services: { connect: { id: serviceId } },
-    });
-  }
-
-  async assignDwelling(objectId: string, dwellingId: number) {
-    return this.objectDataService.update(objectId, {
-      dwelling: { connect: { id: dwellingId } },
     });
   }
 

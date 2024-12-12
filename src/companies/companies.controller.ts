@@ -69,18 +69,4 @@ export class CompaniesController {
   async delete(@Param('id') id: string) {
     return this.companiesService.delete(id);
   }
-
-  // @Delete('pending/cleanup')
-  // @ApiOperation({
-  //   summary: 'Delete all pending antispam companies',
-  //   description: 'Deletes all companies flagged as pending antispam companies.',
-  // })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Pending antispam companies successfully deleted.',
-  // })
-  // async deletePendingAntispamCompanies(@Param('id') id: string) {
-  //   //companiya dolzhna bit v statuse inactive
-  //   return await this.companiesService.deletePendingCompanies();
-  // }
 }

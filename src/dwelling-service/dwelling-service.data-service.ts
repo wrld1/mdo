@@ -1,15 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { DwellingServiceStatus } from '@prisma/client';
+import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
 
 @Injectable()
 export class DwellingServiceDataService {
   constructor(private prisma: PrismaService) {}
 
-  async updateStatus(id: number, status: DwellingServiceStatus) {
+  async update(id: number, { status, amount }: UpdateDwellingServiceDto) {
     return await this.prisma.dwellingService.update({
       where: { id },
-      data: { status },
+      data: { status, amount },
+    });
+  }
+
+  async createMany(
+    dwellingServices: { dwellingId: number; serviceId: number }[],
+  ) {
+    return await this.prisma.dwellingService.createMany({
+      data: dwellingServices.map((service) => ({
+        ...service,
+        status: 'ACTIVE',
+      })),
     });
   }
 
@@ -40,15 +51,6 @@ export class DwellingServiceDataService {
     });
   }
 
-  async removeService(dwellingId: number, serviceId: number) {
-    return this.prisma.dwellingService.deleteMany({
-      where: {
-        dwellingId,
-        serviceId,
-      },
-    });
-  }
-
   async getDwellingServices(dwellingId: number) {
     return this.prisma.dwellingService.findMany({
       where: {
@@ -56,6 +58,15 @@ export class DwellingServiceDataService {
       },
       include: {
         service: true,
+      },
+    });
+  }
+
+  async removeService(dwellingId: number, serviceId: number) {
+    return this.prisma.dwellingService.deleteMany({
+      where: {
+        dwellingId,
+        serviceId,
       },
     });
   }

@@ -23,7 +23,7 @@ import { AclModule } from 'src/acl/acl.module';
     JwtModule.register({
       global: true,
       secret: jwtConstants.accessSecret,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: jwtConstants.accessExpiresIn },
     }),
   ],
   controllers: [AuthController],

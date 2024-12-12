@@ -1,43 +1,77 @@
+import { DwellingService } from './../dwelling/dwelling.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { DwellingServiceStatus } from '@prisma/client';
 import { DwellingServiceDataService } from './dwelling-service.data-service';
+import { ServiceService } from 'src/service/service.service';
+import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
 
 @Injectable()
 export class DwellingServiceService {
-  constructor(private dwellingServiceDataService: DwellingServiceDataService) {}
+  constructor(
+    private dwellingServiceDataService: DwellingServiceDataService,
+    private dwellingService: DwellingService,
+    private serviceService: ServiceService,
+  ) {}
 
-  async updateStatus(id: number, status: DwellingServiceStatus) {
+  async update(id: number, { status, amount }: UpdateDwellingServiceDto) {
     try {
       const existingService =
         await this.dwellingServiceDataService.findById(id);
       if (!existingService) {
-        throw new NotFoundException(`Не знайдено сервіс`);
+        throw new NotFoundException(`Не знайдено`);
       }
 
-      return await this.dwellingServiceDataService.updateStatus(id, status);
+      return await this.dwellingServiceDataService.update(id, {
+        status,
+        amount,
+      });
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      throw new NotFoundException(`Сталася помилка при оновленні статусу`);
+      throw error;
     }
   }
 
-  async updateAmount(id: number, amount: number) {
+  async addService(dwellingId: number, serviceId: number) {
     try {
-      const existingService =
-        await this.dwellingServiceDataService.findById(id);
+      const dwelling = await this.dwellingService.findOne(dwellingId);
 
-      if (!existingService) {
-        throw new NotFoundException(`Не знайдено сервіс`);
+      if (!dwelling) {
+        throw new NotFoundException(`Квартиру не знайдено`);
       }
 
-      return await this.dwellingServiceDataService.updateAmount(id, amount);
+      const service = await this.serviceService.findOne(serviceId);
+
+      if (!service) {
+        throw new NotFoundException(`Сервіс не знайдено`);
+      }
+
+      return await this.dwellingServiceDataService.addService(
+        dwellingId,
+        serviceId,
+      );
     } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
+      throw error;
+    }
+  }
+
+  async removeService(dwellingId: number, serviceId: number) {
+    try {
+      const dwelling = await this.dwellingService.findOne(dwellingId);
+
+      if (!dwelling) {
+        throw new NotFoundException(`Квартиру не знайдено`);
       }
-      throw new NotFoundException(`Сталася помилка при оновленні кількості`);
+
+      const service = await this.serviceService.findOne(serviceId);
+
+      if (!service) {
+        throw new NotFoundException(`Сервіс не знайдено`);
+      }
+
+      return await this.dwellingServiceDataService.removeService(
+        dwellingId,
+        serviceId,
+      );
+    } catch (error) {
+      throw error;
     }
   }
 }

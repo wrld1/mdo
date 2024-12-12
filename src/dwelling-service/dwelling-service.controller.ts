@@ -1,47 +1,66 @@
 import {
   Controller,
-  Get,
   Body,
   Patch,
   Param,
   ParseIntPipe,
+  Post,
+  Delete,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { DwellingServiceService } from './dwelling-service.service';
-import { DwellingServiceStatus } from '@prisma/client';
+import { CreateDwellingServiceDto } from './dto/create-dwelling-service.dto';
+import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
 
-@ApiTags('dwelling-services')
+@ApiTags('Dwelling-services')
 @Controller('dwelling-services')
 export class DwellingServiceController {
   constructor(
     private readonly dwellingServiceService: DwellingServiceService,
   ) {}
 
-  @Patch(':id/status')
-  @ApiOperation({ summary: 'Update dwelling service status' })
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update dwelling service status or amount' })
   @ApiResponse({
     status: 200,
-    description: 'Dwelling service status successfully updated',
+    description: 'Dwelling service successfully updated',
   })
   @ApiResponse({ status: 404, description: 'Dwelling service not found' })
   async updateStatus(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status') status: DwellingServiceStatus,
+    @Body() updateDwellingServiceDto: UpdateDwellingServiceDto,
   ) {
-    return await this.dwellingServiceService.updateStatus(id, status);
+    return await this.dwellingServiceService.update(
+      id,
+      updateDwellingServiceDto,
+    );
   }
 
-  @Patch(':id/amount')
-  @ApiOperation({ summary: 'Update dwelling service amount' })
+  //add acl check(admin & manager)
+  @Post()
+  @ApiOperation({ summary: 'Add a service to a dwelling' })
+  @ApiResponse({
+    status: 201,
+    description: 'The service has been added to the dwelling.',
+  })
+  async addService(@Body() createDwellingServiceDto: CreateDwellingServiceDto) {
+    return await this.dwellingServiceService.addService(
+      createDwellingServiceDto.dwellingId,
+      createDwellingServiceDto.serviceId,
+    );
+  }
+
+  //add acl check(admin & manager)
+  @Delete()
+  @ApiOperation({ summary: 'Remove a service from a dwelling' })
   @ApiResponse({
     status: 200,
-    description: 'Dwelling service amount successfully updated',
+    description: 'The service has been removed from the dwelling.',
   })
-  @ApiResponse({ status: 404, description: 'Dwelling service not found' })
-  async updateAmount(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('amount') amount: number,
-  ) {
-    return await this.dwellingServiceService.updateAmount(id, amount);
+  async removeService(@Body() body: { dwellingId: number; serviceId: number }) {
+    return await this.dwellingServiceService.removeService(
+      body.dwellingId,
+      body.serviceId,
+    );
   }
 }

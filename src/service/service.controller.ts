@@ -25,6 +25,7 @@ import {
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
+  // когда я добавляю новый сервис, то я добавляю этот сервис для всех двеллингов которые у меня в этом обьекте
   @Post()
   @ApiOperation({ summary: 'Create a new service' })
   @ApiBody({ type: CreateServiceDto })

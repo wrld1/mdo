@@ -33,6 +33,7 @@ export class ObjectController {
     return await this.objectService.create(data);
   }
 
+  //add query param
   @Get()
   @ApiOperation({ summary: 'Get all objects' })
   @ApiQuery({
@@ -64,28 +65,6 @@ export class ObjectController {
   @ApiResponse({ status: 200, description: 'Object updated successfully' })
   async update(@Param('id') id: string, @Body() data: UpdateObjectDto) {
     return await this.objectService.update(id, data);
-  }
-
-  @Post(':id/dwelling')
-  @ApiOperation({ summary: 'Assign dwelling to object' })
-  @ApiParam({ name: 'id', description: 'Object ID' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        dwellingId: { type: 'number', description: 'Dwelling ID to assign' },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Dwelling successfully assigned to object',
-  })
-  async assignDwelling(
-    @Param('id') id: string,
-    @Body() data: { dwellingId: number },
-  ) {
-    return await this.objectService.assignDwelling(id, data.dwellingId);
   }
 
   @Patch(':id/company')
