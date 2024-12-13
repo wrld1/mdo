@@ -1,7 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsInt, IsEnum } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { SortOrder } from 'src/common/enums/SortOrder';
 
 export class FindDwellingsDto {
   @ApiPropertyOptional({ example: 'uuid-string' })

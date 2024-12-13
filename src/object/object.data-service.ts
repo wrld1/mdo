@@ -16,44 +16,33 @@ export class ObjectDataService {
     });
   }
 
-  // async find(params: {
-  //   where?: Prisma.ObjectWhereInput;
-  //   include?: Prisma.ObjectInclude;
-  //   take?: number;
-  //   skip?: number;
-  //   orderBy?: Prisma.ObjectOrderByWithRelationInput;
-  // }) {
-  //   const { where, include, take, skip, orderBy } = params;
+  async find(
+    params: {
+      where?: Prisma.ObjectWhereInput;
+      include?: Prisma.ObjectInclude;
+      take?: number;
+      skip?: number;
+      orderBy?: Prisma.ObjectOrderByWithRelationInput;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const { where, include, take, skip, orderBy } = params;
 
-  //   return this.prisma.object.findMany({
-  //     where,
-  //     include,
-  //     take,
-  //     skip,
-  //     orderBy,
-  //   });
-  // }
+    return (tx || this.prisma).object.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include,
+    });
+  }
 
-  async find(params: {
-    where?: Prisma.ObjectWhereInput;
-    include?: Prisma.ObjectInclude;
-    take?: number;
-    skip?: number;
-    orderBy?: Prisma.ObjectOrderByWithRelationInput;
-    many?: boolean;
-  }) {
-    const { where, include, many = false, take, skip, orderBy } = params;
-
-    if (many) {
-      return this.prisma.object.findMany({
-        where,
-        include,
-        take,
-        skip,
-        orderBy,
-      });
-    }
-    return this.prisma.object.findFirst({ where, include });
+  async count(
+    params: { where: Prisma.ObjectWhereInput },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const { where } = params;
+    return (tx || this.prisma).object.count({ where });
   }
 
   async update(id: string, data: Prisma.ObjectUpdateInput) {

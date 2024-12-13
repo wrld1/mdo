@@ -2,24 +2,82 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateObjectDto } from './dto/create-object.dto';
 import { ObjectDataService } from './object.data-service';
 import { UpdateObjectDto } from './dto/update-object.dto';
+import { FindObjectsDto } from './dto/find-objects.dto';
+import { ObjectPaginationDto } from './dto/object-pagination-dto';
+import { SortOrder } from 'src/common/enums/SortOrder';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ObjectService {
-  constructor(private objectDataService: ObjectDataService) {}
+  constructor(
+    private objectDataService: ObjectDataService,
+    private prisma: PrismaService,
+  ) {}
 
   async create(data: CreateObjectDto) {
     return await this.objectDataService.create(data);
   }
 
-  async findAll(companyId?: string) {
-    return this.objectDataService.find({
-      where: companyId ? { companyId } : undefined,
-      include: {
-        company: true,
-        services: true,
-      },
-      many: true,
+  async findAll(
+    params: FindObjectsDto,
+    paginationParams: ObjectPaginationDto,
+    objectSearch: string,
+  ) {
+    const { companyId } = params;
+
+    const {
+      offset = 0,
+      limit = 10,
+      sortBy = 'id',
+      sortOrder = SortOrder.ASC,
+    } = paginationParams;
+
+    const take = Math.min(limit, 100);
+    const skip = offset;
+
+    const orderBy = {
+      [sortBy]: sortOrder,
+    };
+
+    const where: Prisma.ObjectWhereInput = {
+      ...(companyId ? { companyId } : {}),
+    };
+
+    if (objectSearch) {
+      where.address = {
+        contains: objectSearch,
+        mode: 'insensitive',
+      };
+    }
+
+    const [objects, total] = await this.prisma.$transaction(async (tx) => {
+      const objects = await this.objectDataService.find(
+        {
+          where,
+          take,
+          skip,
+          orderBy,
+        },
+        tx,
+      );
+      const total = await this.objectDataService.count(
+        {
+          where: { companyId },
+        },
+        tx,
+      );
+      return [objects, total];
     });
+
+    return {
+      data: objects,
+      meta: {
+        total,
+        size: take,
+        totalPages: Math.ceil(total / take),
+      },
+    };
   }
 
   async findOne(id: string) {
@@ -35,7 +93,7 @@ export class ObjectService {
       throw new NotFoundException("Об'єкт не знайдено");
     }
 
-    return object;
+    return object[0];
   }
 
   async assignCompany(objectId: string, companyId: string) {

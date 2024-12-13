@@ -7,7 +7,7 @@ import { ObjectDataService } from './object.data-service';
 @Module({
   imports: [PrismaModule],
   providers: [ObjectService, ObjectDataService],
-  exports: [ObjectService],
+  exports: [ObjectService, ObjectDataService],
   controllers: [ObjectController],
 })
 export class ObjectModule {}

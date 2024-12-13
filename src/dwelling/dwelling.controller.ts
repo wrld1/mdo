@@ -45,7 +45,13 @@ export class DwellingController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a dwelling by id' })
   @ApiResponse({ status: 200, description: 'Return the dwelling.' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('services') services?: string,
+  ) {
+    if (services === 'true') {
+      return await this.dwellingService.getDwellingServices(id);
+    }
     return await this.dwellingService.findOne(id);
   }
 
@@ -70,15 +76,5 @@ export class DwellingController {
   @ApiResponse({ status: 200, description: 'The dwelling has been deleted.' })
   async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.dwellingService.remove(id);
-  }
-
-  @Get(':id/services')
-  @ApiOperation({ summary: 'Get all services for a dwelling' })
-  @ApiResponse({
-    status: 200,
-    description: 'Return all services for the dwelling.',
-  })
-  async getDwellingServices(@Param('id', ParseIntPipe) id: number) {
-    return await this.dwellingService.getDwellingServices(id);
   }
 }

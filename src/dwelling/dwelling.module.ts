@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { DwellingService } from './dwelling.service';
 import { DwellingDataService } from './dwelling.data-service';
@@ -7,8 +7,8 @@ import { DwellingServiceModule } from 'src/dwelling-service/dwelling-service.mod
 import { UsersModule } from 'src/users/users.module';
 import { AclModule } from 'src/acl/acl.module';
 import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
-import { ObjectModule } from 'src/object/object.module';
 import { ServiceModule } from 'src/service/service.module';
+import { ObjectModule } from 'src/object/object.module';
 
 @Module({
   providers: [DwellingService, DwellingDataService],
@@ -16,11 +16,12 @@ import { ServiceModule } from 'src/service/service.module';
   controllers: [DwellingController],
   imports: [
     PrismaModule,
-    DwellingServiceModule,
+    forwardRef(() => DwellingServiceModule),
     UsersModule,
     AclModule,
     AsyncLocalStorageModule,
     ServiceModule,
+    ObjectModule,
   ],
 })
 export class DwellingModule {}
