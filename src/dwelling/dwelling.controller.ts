@@ -14,14 +14,13 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateDwellingDto } from './dto/create-dwelling.dto';
 import { FindDwellingsDto } from './dto/find-dwellings.dto';
 import { UpdateDwellingDto } from './dto/update-dwelling.dto';
-import { PaginationParamsDto } from './dto/pagination-params.dto';
+import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Dwelling')
 @Controller('dwelling')
 export class DwellingController {
   constructor(private readonly dwellingService: DwellingService) {}
 
-  // при создани двеллинга, я сразу создаю и двеллингСервис и ассайню туда сервисы которые уже есть в обьекте и активны
   @Post()
   @ApiOperation({ summary: 'Create a new dwelling' })
   @ApiResponse({ status: 201, description: 'The dwelling has been created.' })
@@ -55,7 +54,6 @@ export class DwellingController {
     return await this.dwellingService.findOne(id);
   }
 
-  //add acl check(admin & manager)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a dwelling' })
   @ApiResponse({ status: 200, description: 'The dwelling has been updated.' })
@@ -70,7 +68,6 @@ export class DwellingController {
     return await this.dwellingService.update(id, updateDwellingDto);
   }
 
-  //add acl check(admin & manager)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a dwelling' })
   @ApiResponse({ status: 200, description: 'The dwelling has been deleted.' })

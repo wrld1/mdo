@@ -19,9 +19,9 @@ import {
   ApiBody,
   ApiResponse,
 } from '@nestjs/swagger';
-import { ObjectPaginationDto } from './dto/object-pagination-dto';
 import { FindObjectsDto } from './dto/find-objects.dto';
 import { ObjectSearchParamsDto } from './dto/object-search.dto';
+import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Object')
 @Controller('object')
@@ -48,13 +48,15 @@ export class ObjectController {
     description: 'List of objects retrieved successfully',
   })
   async findAll(
-    @Query() companyId: FindObjectsDto,
-    @Query() paginationQuery: ObjectPaginationDto,
+    @Query() { companyId }: FindObjectsDto,
+    @Query() paginationQuery: PaginationParamsDto,
     @Query() { objectSearch }: ObjectSearchParamsDto,
   ) {
+    console.log('paginationQuery', paginationQuery);
+
     return await this.objectService.findAll(
-      companyId,
       paginationQuery,
+      companyId,
       objectSearch,
     );
   }

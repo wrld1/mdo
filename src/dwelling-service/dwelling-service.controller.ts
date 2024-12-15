@@ -36,7 +36,6 @@ export class DwellingServiceController {
     );
   }
 
-  //add acl check(admin & manager)
   @Post()
   @ApiOperation({ summary: 'Add a service to a dwelling' })
   @ApiResponse({
@@ -50,7 +49,6 @@ export class DwellingServiceController {
     );
   }
 
-  //add acl check(admin & manager)
   @Delete()
   @ApiOperation({ summary: 'Remove a service from a dwelling' })
   @ApiResponse({

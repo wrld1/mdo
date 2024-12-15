@@ -19,4 +19,10 @@ export class FindDwellingsDto {
   @IsInt()
   @Transform(({ value }) => (value ? parseInt(value) : undefined))
   entrance?: number;
+
+  @ApiPropertyOptional({ example: 1 })
+  @IsOptional()
+  @IsInt()
+  @Transform(({ value }) => (value ? parseInt(value) : undefined))
+  number?: number;
 }

@@ -9,14 +9,14 @@ import { AclModule } from 'src/acl/acl.module';
 import { AsyncLocalStorageModule } from 'src/providers/als/als.module';
 import { ServiceModule } from 'src/service/service.module';
 import { ObjectModule } from 'src/object/object.module';
+import { DwellingServiceDataService } from 'src/dwelling-service/dwelling-service.data-service';
 
 @Module({
-  providers: [DwellingService, DwellingDataService],
-  exports: [DwellingService, DwellingDataService],
+  providers: [DwellingService, DwellingDataService, DwellingServiceDataService],
+  exports: [DwellingDataService, DwellingService],
   controllers: [DwellingController],
   imports: [
     PrismaModule,
-    forwardRef(() => DwellingServiceModule),
     UsersModule,
     AclModule,
     AsyncLocalStorageModule,

@@ -1,15 +1,24 @@
 import { DwellingService } from './../dwelling/dwelling.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DwellingServiceDataService } from './dwelling-service.data-service';
 import { ServiceService } from 'src/service/service.service';
 import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
+import { DwellingDataService } from 'src/dwelling/dwelling.data-service';
+import { AclService } from 'src/acl/acl.service';
+import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 
 @Injectable()
 export class DwellingServiceService {
   constructor(
     private dwellingServiceDataService: DwellingServiceDataService,
-    private dwellingService: DwellingService,
+    private dwellingDataService: DwellingDataService,
     private serviceService: ServiceService,
+    private alsProvider: AsyncLocalStorageProvider,
+    private aclService: AclService,
   ) {}
 
   async update(id: number, { status, amount }: UpdateDwellingServiceDto) {
@@ -31,9 +40,11 @@ export class DwellingServiceService {
 
   async addService(dwellingId: number, serviceId: number) {
     try {
-      const dwelling = await this.dwellingService.findOne(dwellingId);
+      const dwelling = await this.dwellingDataService.find({
+        where: { id: dwellingId },
+      });
 
-      if (!dwelling) {
+      if (!dwelling[0]) {
         throw new NotFoundException(`Квартиру не знайдено`);
       }
 
@@ -41,6 +52,19 @@ export class DwellingServiceService {
 
       if (!service) {
         throw new NotFoundException(`Сервіс не знайдено`);
+      }
+
+      const userId = this.alsProvider.get('uId');
+
+      const canUpdate = await this.aclService.checkPermission(userId, [
+        `/companyManagement/${dwelling[0].object.companyId}`,
+        'admin',
+      ]);
+
+      if (!canUpdate) {
+        throw new ForbiddenException(
+          'User does not have the required permission',
+        );
       }
 
       return await this.dwellingServiceDataService.addService(
@@ -54,9 +78,11 @@ export class DwellingServiceService {
 
   async removeService(dwellingId: number, serviceId: number) {
     try {
-      const dwelling = await this.dwellingService.findOne(dwellingId);
+      const dwelling = await this.dwellingDataService.find({
+        where: { id: dwellingId },
+      });
 
-      if (!dwelling) {
+      if (!dwelling[0]) {
         throw new NotFoundException(`Квартиру не знайдено`);
       }
 
@@ -64,6 +90,19 @@ export class DwellingServiceService {
 
       if (!service) {
         throw new NotFoundException(`Сервіс не знайдено`);
+      }
+
+      const userId = this.alsProvider.get('uId');
+
+      const canRemove = await this.aclService.checkPermission(userId, [
+        `/companyManagement/${dwelling[0].object.companyId}`,
+        'admin',
+      ]);
+
+      if (!canRemove) {
+        throw new ForbiddenException(
+          'User does not have the required permission',
+        );
       }
 
       return await this.dwellingServiceDataService.removeService(

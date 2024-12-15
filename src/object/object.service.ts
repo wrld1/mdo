@@ -2,11 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateObjectDto } from './dto/create-object.dto';
 import { ObjectDataService } from './object.data-service';
 import { UpdateObjectDto } from './dto/update-object.dto';
-import { FindObjectsDto } from './dto/find-objects.dto';
-import { ObjectPaginationDto } from './dto/object-pagination-dto';
 import { SortOrder } from 'src/common/enums/SortOrder';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class ObjectService {
@@ -20,12 +19,10 @@ export class ObjectService {
   }
 
   async findAll(
-    params: FindObjectsDto,
-    paginationParams: ObjectPaginationDto,
-    objectSearch: string,
+    paginationParams: PaginationParamsDto,
+    companyId?: string,
+    objectSearch?: string,
   ) {
-    const { companyId } = params;
-
     const {
       offset = 0,
       limit = 10,

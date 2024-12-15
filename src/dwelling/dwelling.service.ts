@@ -1,7 +1,10 @@
 import { ObjectDataService } from './../object/object.data-service';
 import { ServiceService } from 'src/service/service.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { CreateDwellingDto } from './dto/create-dwelling.dto';
 import { DwellingDataService } from './dwelling.data-service';
@@ -10,9 +13,9 @@ import { FindDwellingsDto } from './dto/find-dwellings.dto';
 import { UserDataService } from 'src/users/user-data.service';
 import { DwellingServiceDataService } from 'src/dwelling-service/dwelling-service.data-service';
 import { SortOrder } from 'src/common/enums/SortOrder';
-import { PaginationParamsDto } from './dto/pagination-params.dto';
 import { AclService } from 'src/acl/acl.service';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
+import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class DwellingService {
@@ -20,7 +23,6 @@ export class DwellingService {
     private dwellingDataService: DwellingDataService,
     private userDataService: UserDataService,
     private dwellingServiceDataService: DwellingServiceDataService,
-    private prisma: PrismaService,
     private aclService: AclService,
     private alsProvider: AsyncLocalStorageProvider,
     private serviceService: ServiceService,
@@ -52,7 +54,7 @@ export class DwellingService {
     params: FindDwellingsDto,
     paginationParams: PaginationParamsDto,
   ) {
-    const { objectId, floor, entrance } = params;
+    const { objectId, floor, entrance, number } = params;
     const {
       offset = 0,
       limit = 10,
@@ -67,24 +69,17 @@ export class DwellingService {
       [sortBy]: sortOrder,
     };
 
-    const [dwellings, total] = await this.prisma.$transaction(async (tx) => {
-      const dwellings = await this.dwellingDataService.find(
-        {
-          where: { objectId, floor, entrance },
-          skip,
-          take,
-          orderBy,
-        },
-        tx,
-      );
-      const total = await this.dwellingDataService.count(
-        {
-          where: { objectId, floor, entrance },
-        },
-        tx,
-      );
-      return [dwellings, total];
-    });
+    const [dwellings, total] = await Promise.all([
+      this.dwellingDataService.find({
+        where: { objectId, floor, entrance, number },
+        skip,
+        take,
+        orderBy,
+      }),
+      this.dwellingDataService.count({
+        where: { objectId, floor, entrance, number },
+      }),
+    ]);
 
     return {
       data: dwellings,
@@ -110,17 +105,23 @@ export class DwellingService {
 
   async update(id: number, data: UpdateDwellingDto) {
     try {
-      const userId = this.alsProvider.get('uId');
-
-      // How to get companyId
-      const canUpdate = await this.aclService.checkPermission(userId, [
-        `/companyManagement/${id}`,
-      ]);
-
       const dwelling = await this.findOne(id);
 
       if (!dwelling) {
         throw new NotFoundException(`Квартиру не знайдено`);
+      }
+
+      const userId = this.alsProvider.get('uId');
+
+      const canUpdate = await this.aclService.checkPermission(userId, [
+        `/companyManagement/${dwelling.object.companyId}`,
+        'admin',
+      ]);
+
+      if (!canUpdate) {
+        throw new ForbiddenException(
+          'User does not have the required permission',
+        );
       }
 
       return await this.dwellingDataService.update(id, data);
@@ -135,6 +136,19 @@ export class DwellingService {
 
       if (!dwelling) {
         throw new NotFoundException(`Квартиру не знайдено`);
+      }
+
+      const userId = this.alsProvider.get('uId');
+
+      const canRemove = await this.aclService.checkPermission(userId, [
+        `/companyManagement/${dwelling.object.companyId}`,
+        'admin',
+      ]);
+
+      if (!canRemove) {
+        throw new ForbiddenException(
+          'User does not have the required permission',
+        );
       }
 
       return await this.dwellingDataService.remove(id);
