@@ -2,9 +2,10 @@ import { Expose } from 'class-transformer';
 
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { AclResponse } from 'src/common/interfaces/acl';
 
 @Exclude()
-export class AclResponseDto {
+export class AclResponseDto implements AclResponse {
   @ApiProperty({
     description: 'The resource name',
     example: 'companies',

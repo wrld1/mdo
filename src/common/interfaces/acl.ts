@@ -6,3 +6,8 @@ export interface IAcl {
   resource: string;
   permission: AclPermission;
 }
+
+export interface AclResponse {
+  resource: string;
+  permission: string;
+}

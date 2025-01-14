@@ -8,14 +8,20 @@ export class ServiceService {
   constructor(private serviceDataService: ServiceDataService) {}
 
   async create(data: CreateServiceDto) {
+    //tut preobrazovivat price s decimala na number
     return await this.serviceDataService.create(data);
   }
 
   async findAll(objectId?: string) {
-    return await this.serviceDataService.find({
+    const services = await this.serviceDataService.find({
       where: objectId ? { objectId } : undefined,
       include: { object: true },
     });
+
+    return services.map((service) => ({
+      ...service,
+      price: service.price.toNumber(),
+    }));
   }
 
   async findOne(id: number) {

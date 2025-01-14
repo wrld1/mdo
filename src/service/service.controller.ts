@@ -19,6 +19,8 @@ import {
   ApiBody,
   ApiResponse,
 } from '@nestjs/swagger';
+import { ServiceResponseDto } from './dto/service-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Service')
 @Controller('service')
@@ -31,7 +33,8 @@ export class ServiceController {
   @ApiBody({ type: CreateServiceDto })
   @ApiResponse({ status: 201, description: 'Service successfully created' })
   async create(@Body() data: CreateServiceDto) {
-    return await this.serviceService.create(data);
+    const service = await this.serviceService.create(data);
+    return plainToInstance(ServiceResponseDto, service);
   }
 
   @Get()
@@ -46,7 +49,10 @@ export class ServiceController {
     description: 'List of services retrieved successfully',
   })
   async findAll(@Query('objectId') objectId?: string) {
-    return await this.serviceService.findAll(objectId);
+    const services = await this.serviceService.findAll(objectId);
+    return services.map((service) =>
+      plainToInstance(ServiceResponseDto, service),
+    );
   }
 
   @Get(':id')
@@ -59,7 +65,8 @@ export class ServiceController {
   @ApiResponse({ status: 200, description: 'Service retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Service not found' })
   async findOne(@Param('id') id: number) {
-    return await this.serviceService.findOne(id);
+    const service = await this.serviceService.findOne(id);
+    return plainToInstance(ServiceResponseDto, service);
   }
 
   @Patch(':id')
@@ -73,7 +80,8 @@ export class ServiceController {
   @ApiResponse({ status: 200, description: 'Service updated successfully' })
   @ApiResponse({ status: 404, description: 'Service not found' })
   async update(@Param('id') id: number, @Body() data: UpdateServiceDto) {
-    return await this.serviceService.update(id, data);
+    const service = await this.serviceService.update(id, data);
+    return plainToInstance(ServiceResponseDto, service);
   }
 
   @Delete(':id')

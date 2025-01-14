@@ -40,7 +40,8 @@ export class UsersController {
     description: 'Unauthorized access.',
   })
   async getUsers() {
-    return this.usersService.findAll();
+    const users = await this.usersService.findAll();
+    return users.map((user) => plainToInstance(UserResponseDto, user));
   }
 
   @Get(':id')
@@ -95,7 +96,7 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() { code, type }: Assign,
   ) {
-    return this.usersService.assignCompanyToUser(code, type, id);
+    return await this.usersService.assignCompanyToUser(code, type, id);
   }
 
   @Patch(':id')
@@ -111,6 +112,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async update(@Param('id') id: number, @Body() data: UpdateUserDto) {
-    return this.usersService.update(id, data);
+    const user = await this.usersService.update(id, data);
+    return plainToInstance(UserResponseDto, user);
   }
 }

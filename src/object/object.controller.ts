@@ -22,6 +22,8 @@ import {
 import { FindObjectsDto } from './dto/find-objects.dto';
 import { ObjectSearchParamsDto } from './dto/object-search.dto';
 import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
+import { plainToInstance } from 'class-transformer';
+import { ObjectResponseDto } from './dto/object-response.dto';
 
 @ApiTags('Object')
 @Controller('object')
@@ -33,7 +35,8 @@ export class ObjectController {
   @ApiBody({ type: CreateObjectDto })
   @ApiResponse({ status: 201, description: 'Object successfully created' })
   async create(@Body() data: CreateObjectDto) {
-    return await this.objectService.create(data);
+    const object = await this.objectService.create(data);
+    return plainToInstance(ObjectResponseDto, object);
   }
 
   @Get()
@@ -52,12 +55,13 @@ export class ObjectController {
     @Query() paginationQuery: PaginationParamsDto,
     @Query() { objectSearch }: ObjectSearchParamsDto,
   ) {
-    console.log('paginationQuery', paginationQuery);
-
-    return await this.objectService.findAll(
+    const objects = await this.objectService.findAll(
       paginationQuery,
       companyId,
       objectSearch,
+    );
+    return objects.data.map((object) =>
+      plainToInstance(ObjectResponseDto, object),
     );
   }
 
@@ -67,7 +71,8 @@ export class ObjectController {
   @ApiResponse({ status: 200, description: 'Object retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Object not found' })
   async findOne(@Param('id') id: string) {
-    return await this.objectService.findOne(id);
+    const object = await this.objectService.findOne(id);
+    return plainToInstance(ObjectResponseDto, object);
   }
 
   @Patch(':id')

@@ -19,6 +19,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { CompanyResponseDto } from './dto/company-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Companies')
 @Controller('companies')
@@ -36,7 +38,8 @@ export class CompaniesController {
   })
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   async create(@Body() data: CreateCompanyDto) {
-    return this.companiesService.create(data);
+    const company = await this.companiesService.create(data);
+    return plainToInstance(CompanyResponseDto, company);
   }
 
   @Patch(':id')
@@ -52,7 +55,8 @@ export class CompaniesController {
   })
   @ApiResponse({ status: 404, description: 'Company not found.' })
   async update(@Param('id') id: string, @Body() data: UpdateCompanyDto) {
-    return this.companiesService.update(id, data);
+    const company = await this.companiesService.update(id, data);
+    return plainToInstance(CompanyResponseDto, company);
   }
 
   @Delete(':id')
@@ -67,6 +71,6 @@ export class CompaniesController {
   })
   @ApiResponse({ status: 404, description: 'Company not found.' })
   async delete(@Param('id') id: string) {
-    return this.companiesService.delete(id);
+    return await this.companiesService.delete(id);
   }
 }

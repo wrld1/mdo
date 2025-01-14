@@ -1,3 +1,6 @@
+import { ObjectResponse } from './object';
+import { UserResponse } from './user';
+
 export interface Dwelling {
   id?: number;
   number: number;
@@ -5,4 +8,15 @@ export interface Dwelling {
   entrance?: number;
   objectId: string;
   userId?: number;
+}
+
+export interface DwellingResponse {
+  id: number;
+  name: string;
+  number: string;
+  area: number;
+  createdAt: Date;
+  updatedAt: Date;
+  user?: UserResponse;
+  object: ObjectResponse;
 }

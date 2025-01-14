@@ -15,6 +15,8 @@ import { CreateDwellingDto } from './dto/create-dwelling.dto';
 import { FindDwellingsDto } from './dto/find-dwellings.dto';
 import { UpdateDwellingDto } from './dto/update-dwelling.dto';
 import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
+import { plainToInstance } from 'class-transformer';
+import { DwellingResponseDto } from './dto/dwelling-response.dto';
 
 @ApiTags('Dwelling')
 @Controller('dwelling')
@@ -25,7 +27,8 @@ export class DwellingController {
   @ApiOperation({ summary: 'Create a new dwelling' })
   @ApiResponse({ status: 201, description: 'The dwelling has been created.' })
   async create(@Body() data: CreateDwellingDto) {
-    return await this.dwellingService.create(data);
+    const dwelling = await this.dwellingService.create(data);
+    return plainToInstance(DwellingResponseDto, dwelling);
   }
 
   @Get()
@@ -38,7 +41,16 @@ export class DwellingController {
     @Query() query: FindDwellingsDto,
     @Query() paginationQuery: PaginationParamsDto,
   ) {
-    return await this.dwellingService.findAll(query, paginationQuery);
+    const dwellings = await this.dwellingService.findAll(
+      query,
+      paginationQuery,
+    );
+    return {
+      ...dwellings,
+      items: dwellings.data.map((dwelling) =>
+        plainToInstance(DwellingResponseDto, dwelling),
+      ),
+    };
   }
 
   @Get(':id')
@@ -51,7 +63,8 @@ export class DwellingController {
     if (services === 'true') {
       return await this.dwellingService.getDwellingServices(id);
     }
-    return await this.dwellingService.findOne(id);
+    const dwelling = await this.dwellingService.findOne(id);
+    return plainToInstance(DwellingResponseDto, dwelling);
   }
 
   @Patch(':id')

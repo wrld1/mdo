@@ -8,21 +8,31 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  email        String        @unique
-  password     String
-  name         String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  isVerified   Boolean       @default(false)
-  refreshToken String?
-  fraudStatus  FraudStatus   @default(CLEAR)
-  metadata     Json?         @db.JsonB
-  Acl          Acl[]
-  companies    UserCompany[]
-  dwelling     Dwelling[]
+  id                 Int           @id @default(autoincrement())
+  email              String        @unique
+  password           String
+  name               String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  isVerified         Boolean       @default(false)
+  refreshToken       String?
+  fraudStatus        FraudStatus   @default(CLEAR)
+  metadata           Json?         @db.JsonB
+  Acl                Acl[]
+  companies          UserCompany[]
+  dwelling           Dwelling[]
+  orders             Order[]
+  responsibleOrders  Order[]       @relation("ResponsibleUser")
 
   @@map("user")
+}
+
+model Acl {
+  id         Int           @id @default(autoincrement())
+  userId     Int
+  resource   String
+  permission AclPermission
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Company {
@@ -35,6 +45,7 @@ model Company {
   updatedAt DateTime      @updatedAt
   objects   Object[]
   users     UserCompany[]
+  orders    Order[]
 
   @@map("company")
 }
@@ -58,6 +69,7 @@ model Object {
   companyId String?
   services  Service[]
   dwelling  Dwelling[]
+  orders    Order[]
 }
 
 model Dwelling {
@@ -72,6 +84,7 @@ model Dwelling {
   user            User?             @relation(fields: [userId], references: [id])
   services        Service[]
   DwellingService DwellingService[]
+  orders          Order[]
 }
 
 model DwellingService {
@@ -91,7 +104,7 @@ model Service {
   id          Int    @id @default(autoincrement())
   name        String
   description String
-  price       String
+  price       Decimal
   logo        String
 
   object          Object?           @relation(fields: [objectId], references: [id])
@@ -101,12 +114,27 @@ model Service {
   DwellingService DwellingService[]
 }
 
-model Acl {
-  id         Int           @id @default(autoincrement())
-  userId     Int
-  resource   String
-  permission AclPermission
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Order {
+  // id                Int       @id @default(autoincrement())
+  id      String     @id @default(uuid())
+  name              OrderType
+  description       String
+  objectId          String
+  object            Object    @relation(fields: [objectId], references: [id])
+  dwellingId        Int?
+  dwelling          Dwelling? @relation(fields: [dwellingId], references: [id])
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  companyId         String
+  company           Company   @relation(fields: [companyId], references: [id])
+  responsibleUserId Int?
+  responsibleUser   User?     @relation("ResponsibleUser", fields: [responsibleUserId], references: [id])
+  price Decimal @default(0)
+  orderStatus  OrderStatus
+
+  @@map("order")
 }
 
 enum CompanyType {
@@ -141,4 +169,17 @@ enum DwellingServiceStatus {
   ACTIVE
   SUSPENDED
   INACTIVE
+}
+
+enum OrderStatus {
+  RECEIVED
+  IN_PROGRESS
+  FINISHED
+}
+
+enum OrderType {
+  ELECTRICITY
+  WATER
+  GAS
+  OTHER
 }

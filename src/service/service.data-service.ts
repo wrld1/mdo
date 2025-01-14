@@ -1,20 +1,31 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { CreateServiceDto } from './dto/create-service.dto';
+import { Decimal } from '@prisma/client/runtime/library';
 
 const defaultInclude = {
   object: true,
 } as const;
 
+export const transformDecimal = (decimal: Decimal): number => {
+  return decimal ? decimal.toNumber() : 0;
+};
+
 @Injectable()
 export class ServiceDataService {
   constructor(private prisma: PrismaService) {}
 
-  async create(data: Prisma.ServiceCreateInput) {
-    return this.prisma.service.create({
-      data,
+  async create(data: CreateServiceDto) {
+    const service = await this.prisma.service.create({
+      data: { ...data, price: new Decimal(data.price) },
       include: defaultInclude,
     });
+
+    return {
+      ...service,
+      price: transformDecimal(service.price),
+    };
   }
 
   async find(params: {
