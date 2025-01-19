@@ -8,7 +8,6 @@ export class ServiceService {
   constructor(private serviceDataService: ServiceDataService) {}
 
   async create(data: CreateServiceDto) {
-    //tut preobrazovivat price s decimala na number
     return await this.serviceDataService.create(data);
   }
 

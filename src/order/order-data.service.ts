@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class OrderDataService {
@@ -20,32 +21,30 @@ export class OrderDataService {
     });
   }
 
-  async findAll() {
+  async find(params: {
+    where?: Prisma.OrderWhereInput;
+    include?: Prisma.OrderInclude;
+    take?: number;
+    skip?: number;
+    orderBy?: Prisma.OrderOrderByWithRelationInput;
+  }) {
+    const { where, include, take, skip, orderBy } = params;
+
     return this.prisma.order.findMany({
-      include: {
-        object: true,
-        dwelling: true,
-        user: true,
-        company: true,
-        responsibleUser: true,
-      },
+      where,
+      skip,
+      take,
+      orderBy,
+      include,
     });
   }
 
-  async findOne(id: number) {
-    return this.prisma.order.findUnique({
-      where: { id },
-      include: {
-        object: true,
-        dwelling: true,
-        user: true,
-        company: true,
-        responsibleUser: true,
-      },
-    });
+  async count(params: { where: Prisma.OrderWhereInput }) {
+    const { where } = params;
+    return this.prisma.order.count({ where });
   }
 
-  async update(id: number, updateOrderDto: UpdateOrderDto) {
+  async update(id: string, updateOrderDto: UpdateOrderDto) {
     return this.prisma.order.update({
       where: { id },
       data: updateOrderDto,
@@ -59,7 +58,7 @@ export class OrderDataService {
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return this.prisma.order.delete({
       where: { id },
     });

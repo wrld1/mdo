@@ -2,20 +2,18 @@ import { Company, User } from '@prisma/client';
 import { Dwelling } from './dwelling';
 import { UserResponse } from './user';
 
+export type OrderType = 'ELECTRICITY' | 'WATER' | 'GAS' | 'OTHER';
+
 export interface Order {
-  id: number;
   name: string;
+  type: OrderType;
   description: string;
   objectId: string;
-  object: Object;
   dwellingId?: number;
   dwelling?: Dwelling;
-  createdAt: Date;
-  updatedAt: Date;
   userId?: number;
   user?: User;
   companyId: string;
-  company: Company;
   responsibleUserId?: number;
   responsibleUser?: UserResponse;
 }

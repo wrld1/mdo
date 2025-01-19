@@ -48,24 +48,17 @@ export class ObjectService {
       };
     }
 
-    const [objects, total] = await this.prisma.$transaction(async (tx) => {
-      const objects = await this.objectDataService.find(
-        {
-          where,
-          take,
-          skip,
-          orderBy,
-        },
-        tx,
-      );
-      const total = await this.objectDataService.count(
-        {
-          where: { companyId },
-        },
-        tx,
-      );
-      return [objects, total];
-    });
+    const [objects, total] = await Promise.all([
+      this.objectDataService.find({
+        where,
+        take,
+        skip,
+        orderBy,
+      }),
+      this.objectDataService.count({
+        where: { companyId },
+      }),
+    ]);
 
     return {
       data: objects,

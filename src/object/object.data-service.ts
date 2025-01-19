@@ -16,19 +16,16 @@ export class ObjectDataService {
     });
   }
 
-  async find(
-    params: {
-      where?: Prisma.ObjectWhereInput;
-      include?: Prisma.ObjectInclude;
-      take?: number;
-      skip?: number;
-      orderBy?: Prisma.ObjectOrderByWithRelationInput;
-    },
-    tx?: Prisma.TransactionClient,
-  ) {
+  async find(params: {
+    where?: Prisma.ObjectWhereInput;
+    include?: Prisma.ObjectInclude;
+    take?: number;
+    skip?: number;
+    orderBy?: Prisma.ObjectOrderByWithRelationInput;
+  }) {
     const { where, include, take, skip, orderBy } = params;
 
-    return (tx || this.prisma).object.findMany({
+    return this.prisma.object.findMany({
       where,
       skip,
       take,
