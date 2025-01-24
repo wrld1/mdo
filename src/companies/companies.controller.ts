@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Patch,
   Post,
@@ -39,6 +40,23 @@ export class CompaniesController {
   @ApiResponse({ status: 400, description: 'Invalid data provided.' })
   async create(@Body() data: CreateCompanyDto) {
     const company = await this.companiesService.create(data);
+    return plainToInstance(CompanyResponseDto, company);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Retrieve a single company by ID' })
+  @ApiParam({
+    name: 'id',
+    description: 'The ID of the company to retrieve',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The company has been successfully retrieved.',
+    type: CompanyResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Company not found.' })
+  async findOne(@Param('id') id: string) {
+    const company = await this.companiesService.findOne(id);
     return plainToInstance(CompanyResponseDto, company);
   }
 

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { CompaniesDataService } from './companies-data.service';
@@ -11,6 +12,7 @@ import { AclService } from 'src/acl/acl.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserCompanyDataService } from 'src/user-company/user-company-data.service';
 import { AclDataService } from 'src/acl/acl-data.service';
+import { Company } from '@prisma/client';
 
 @Injectable()
 export class CompaniesService {
@@ -43,6 +45,23 @@ export class CompaniesService {
     }
 
     return await this.companiesDataService.update(id, data);
+  }
+
+  async findOne(id: string) {
+    const company = await this.companiesDataService.findOne({
+      where: { id },
+      include: {
+        objects: true,
+        users: true,
+        orders: true,
+      },
+    });
+
+    if (!company) {
+      throw new NotFoundException(`Компанію не знайдено`);
+    }
+
+    return company;
   }
 
   async delete(id: string) {
