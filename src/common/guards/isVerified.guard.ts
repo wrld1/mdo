@@ -16,7 +16,7 @@ export class isVerifiedGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const { user } = request;
 
-    const foundUser = await this.usersService.findOneById(user.uId);
+    const foundUser = await this.usersService.findOne(user.uId);
 
     if (foundUser && foundUser.isVerified) {
       return true;

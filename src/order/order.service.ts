@@ -1,15 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderDataService } from './order-data.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
 import { SortOrder } from 'src/common/enums/SortOrder';
-import { Prisma } from '@prisma/client';
-import { OrderType } from 'src/common/interfaces/order';
+import { Prisma, User } from '@prisma/client';
+import { OrderType, OrderUpdate } from 'src/common/interfaces/order';
+import { AclService } from 'src/acl/acl.service';
+import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 
 @Injectable()
 export class OrderService {
-  constructor(private orderDataService: OrderDataService) {}
+  constructor(
+    private orderDataService: OrderDataService,
+    private aclService: AclService,
+    private alsProvider: AsyncLocalStorageProvider,
+  ) {}
 
   async create(createOrderDto: CreateOrderDto) {
     return await this.orderDataService.create(createOrderDto);
@@ -99,11 +109,34 @@ export class OrderService {
     return order[0];
   }
 
-  async update(id: string, updateOrderDto: UpdateOrderDto) {
+  async update(id: string, updateOrderDto: OrderUpdate) {
+    const existingOrder = await this.findOne(id);
+
+    const userId = this.alsProvider.get('uId');
+
+    if (updateOrderDto.responsibleUserId !== undefined) {
+      const hasPermission = await this.aclService.checkPermission(userId, [
+        'admin',
+        `companyManagement/${existingOrder.companyId}`,
+      ]);
+
+      if (!hasPermission) {
+        throw new ForbiddenException(
+          'Ви не можете назначати відповідального працівника',
+        );
+      }
+    }
+
     return await this.orderDataService.update(id, updateOrderDto);
   }
 
   async remove(id: string) {
+    const existingOrder = await this.findOne(id);
+
+    if (!existingOrder) {
+      throw new NotFoundException('Заявку не знайдено');
+    }
+
     return await this.orderDataService.remove(id);
   }
 }

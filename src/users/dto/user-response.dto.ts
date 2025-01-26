@@ -34,5 +34,5 @@ export class UserResponseDto implements UserResponse {
   })
   @Expose()
   @Type(() => AclResponseDto)
-  Acl: AclResponseDto[];
+  acl: AclResponseDto[];
 }

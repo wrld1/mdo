@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { OrderStatus } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { Order, OrderResponse } from 'src/common/interfaces/order';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
@@ -35,4 +36,20 @@ export class OrderResponseDto implements OrderResponse {
   @Expose()
   @Type(() => UserResponseDto)
   responsibleUser?: UserResponseDto;
+
+  @ApiProperty({
+    example: 1000.5,
+    description: 'Order price',
+    type: Number,
+  })
+  @Expose()
+  price: number;
+
+  @ApiProperty({
+    enum: OrderStatus,
+    example: OrderStatus.RECEIVED,
+    description: 'Current order status',
+  })
+  @Expose()
+  orderStatus: OrderStatus;
 }

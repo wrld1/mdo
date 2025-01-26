@@ -12,6 +12,7 @@ import { ObjectModule } from 'src/object/object.module';
 import { ServiceModule } from 'src/service/service.module';
 import { DwellingModule } from 'src/dwelling/dwelling.module';
 import { DwellingServiceModule } from 'src/dwelling-service/dwelling-service.module';
+import { OrderModule } from 'src/order/order.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { DwellingServiceModule } from 'src/dwelling-service/dwelling-service.mod
     UserCompanyModule,
     AsyncLocalStorageModule,
     ServiceModule,
+    OrderModule,
     ObjectModule,
     DwellingModule,
     DwellingServiceModule,

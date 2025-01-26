@@ -63,7 +63,7 @@ describe('EmailService', () => {
       const email = 'test@example.com';
 
       jest.spyOn(alsProvider, 'get').mockReturnValue(userId);
-      jest.spyOn(usersService, 'findOneById').mockResolvedValue({
+      jest.spyOn(usersService, 'findOne').mockResolvedValue({
         id: 1,
         email: 'test@example.com',
         password: 'hashedpassword',
@@ -80,7 +80,7 @@ describe('EmailService', () => {
       await emailService.sendVerificationEmail();
 
       expect(alsProvider.get).toHaveBeenCalledWith('uId');
-      expect(usersService.findOneById).toHaveBeenCalledWith(userId);
+      expect(usersService.findOne).toHaveBeenCalledWith(userId);
       expect(jwtService.sign).toHaveBeenCalledWith(
         { uId: userId },
         { secret: 'secret', expiresIn: '24h' },

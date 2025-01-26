@@ -23,11 +23,11 @@ export class UserDataService {
     return this.prisma.user.findMany();
   }
 
-  async findOneById(id: number) {
+  async findOne(id: number) {
     return this.prisma.user.findUnique({
       where: { id },
       include: {
-        Acl: true,
+        acl: true,
       },
     });
   }

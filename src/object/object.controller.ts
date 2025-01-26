@@ -24,6 +24,7 @@ import { ObjectSearchParamsDto } from './dto/object-search.dto';
 import { PaginationParamsDto } from 'src/common/dto/pagination.dto';
 import { plainToInstance } from 'class-transformer';
 import { ObjectResponseDto } from './dto/object-response.dto';
+import { PagedObjectResponseDto } from './dto/paged-object-response.dto';
 
 @ApiTags('Object')
 @Controller('object')
@@ -60,9 +61,10 @@ export class ObjectController {
       companyId,
       objectSearch,
     );
-    return objects.data.map((object) =>
-      plainToInstance(ObjectResponseDto, object),
-    );
+    return plainToInstance(PagedObjectResponseDto, {
+      data: objects.data,
+      meta: objects.meta,
+    });
   }
 
   @Get(':id')

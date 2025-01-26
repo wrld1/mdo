@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
+import { PaginationMetaResponseDto } from 'src/common/dto/pagination-meta.response.dto';
 import { ObjectResponse } from 'src/common/interfaces/object';
 import { CompanyResponseDto } from 'src/companies/dto/company-response.dto';
 import { DwellingResponseDto } from 'src/dwelling/dto/dwelling-response.dto';
@@ -25,7 +26,7 @@ export class ObjectResponseDto implements ObjectResponse {
   @Expose()
   @Type(() => CompanyResponseDto)
   @ApiProperty({
-    type: CompanyResponseDto,
+    type: () => [CompanyResponseDto],
     example: {
       id: 'comp-123',
       name: 'ЖЕК №1',
@@ -36,7 +37,7 @@ export class ObjectResponseDto implements ObjectResponse {
   @Expose()
   @Type(() => DwellingResponseDto)
   @ApiProperty({
-    type: [DwellingResponseDto],
+    type: () => [DwellingResponseDto],
     example: [
       {
         id: 1,

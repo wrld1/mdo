@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
 import { hashPassword } from 'src/common/utils/shared/hashPassword';
@@ -65,8 +69,8 @@ export class UsersService {
     return await this.userDataService.findAll();
   }
 
-  async findOneById(id: number) {
-    return await this.userDataService.findOneById(id);
+  async findOne(id: number) {
+    return await this.userDataService.findOne(id);
   }
 
   async findOneByEmail(email: string) {
@@ -78,10 +82,22 @@ export class UsersService {
       updateUserDto.password = await hashPassword(updateUserDto.password);
     }
 
+    const existingUser = await this.findOne(id);
+
+    if (!existingUser) {
+      throw new NotFoundException('Користувача не знайдено');
+    }
+
     return await this.userDataService.update(id, updateUserDto);
   }
 
   async remove(id: number) {
+    const existingUser = await this.findOne(id);
+
+    if (!existingUser) {
+      throw new NotFoundException('Користувача не знайдено');
+    }
+
     return await this.userDataService.remove(id);
   }
 }

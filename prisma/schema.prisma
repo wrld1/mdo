@@ -18,7 +18,7 @@ model User {
   refreshToken       String?
   fraudStatus        FraudStatus   @default(CLEAR)
   metadata           Json?         @db.JsonB
-  Acl                Acl[]
+  acl                Acl[]
   companies          UserCompany[]
   dwelling           Dwelling[]
   orders             Order[]

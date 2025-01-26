@@ -10,5 +10,5 @@ export interface UserResponse {
   email: string;
   isVerified: boolean;
   fraudStatus: FraudStatus;
-  Acl: AclResponse[];
+  acl: AclResponse[];
 }

@@ -86,7 +86,7 @@ export class AuthService {
     userId: number,
     rt: string,
   ): Promise<{ accessToken: string }> {
-    const user = await this.usersService.findOneById(userId);
+    const user = await this.usersService.findOne(userId);
 
     if (!user || !user.refreshToken) {
       throw new UnauthorizedException('Access Denied');
@@ -168,7 +168,7 @@ export class AuthService {
         throw new UnauthorizedException('Невірне посилання');
       }
 
-      const user = await this.usersService.findOneById(payload.uId);
+      const user = await this.usersService.findOne(payload.uId);
 
       if (!user) {
         throw new BadRequestException('Не вдалося оновити пароль');
@@ -187,7 +187,7 @@ export class AuthService {
 
   async changePassword(changePasswordDto: ChangePasswordDto) {
     const userId = this.alsProvider.get('uId');
-    const user = await this.usersService.findOneById(userId);
+    const user = await this.usersService.findOne(userId);
 
     if (!user) {
       throw new InternalServerErrorException();
@@ -240,7 +240,7 @@ export class AuthService {
         throw new UnauthorizedException('Невірне посилання');
       }
 
-      const user = await this.usersService.findOneById(payload.uId);
+      const user = await this.usersService.findOne(payload.uId);
 
       if (!user) {
         throw new BadRequestException('Щось пішло не так');

@@ -63,7 +63,7 @@ export class UsersController {
   async getUserById(
     @Param('id', ParseIntPipe) userId: number,
   ): Promise<UserResponseDto> {
-    const user = await this.usersService.findOneById(userId);
+    const user = await this.usersService.findOne(userId);
     return plainToInstance(UserResponseDto, user);
   }
 

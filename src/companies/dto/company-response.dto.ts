@@ -37,7 +37,7 @@ export class CompanyResponseDto implements CompanyResponse {
   @Expose()
   @Type(() => ObjectResponseDto)
   @ApiProperty({
-    type: [ObjectResponseDto],
+    type: () => [ObjectResponseDto],
     required: false,
   })
   objects?: ObjectResponseDto[];

@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Prisma } from '@prisma/client';
+import { OrderUpdate } from 'src/common/interfaces/order';
 
 @Injectable()
 export class OrderDataService {
@@ -44,7 +45,7 @@ export class OrderDataService {
     return this.prisma.order.count({ where });
   }
 
-  async update(id: string, updateOrderDto: UpdateOrderDto) {
+  async update(id: string, updateOrderDto: OrderUpdate) {
     return this.prisma.order.update({
       where: { id },
       data: updateOrderDto,
