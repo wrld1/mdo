@@ -1,7 +1,8 @@
 import { User } from '@prisma/client';
-import { Dwelling } from './dwelling';
+import { Dwelling, DwellingResponse } from './dwelling';
 import { UserResponse } from './user';
 import { Decimal } from '@prisma/client/runtime/library';
+import { ObjectResponse } from './object';
 
 export type OrderType = 'ELECTRICITY' | 'WATER' | 'GAS' | 'OTHER';
 export type OrderStatus =
@@ -29,10 +30,13 @@ export interface OrderResponse {
   id: string;
   name: string;
   description: string;
+  object: ObjectResponse;
+  dwelling?: DwellingResponse;
   createdAt: Date;
-  status: string;
+  type: OrderType;
+  user: UserResponse;
   responsibleUser?: UserResponse;
-  price: number;
+  price?: number;
   orderStatus: OrderStatus;
 }
 

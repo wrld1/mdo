@@ -33,7 +33,9 @@ export class OrderController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   async create(@Body() createOrderDto: CreateOrderDto) {
     const order = await this.ordersService.create(createOrderDto);
-    return plainToInstance(OrderResponseDto, order);
+    return plainToInstance(OrderResponseDto, order, {
+      enableImplicitConversion: true,
+    });
   }
 
   @Get()
@@ -51,7 +53,11 @@ export class OrderController {
       orderSearch,
       orderType,
     );
-    return orders.data.map((order) => plainToInstance(OrderResponseDto, order));
+    return orders.data.map((order) =>
+      plainToInstance(OrderResponseDto, order, {
+        enableImplicitConversion: true,
+      }),
+    );
   }
 
   @Get(':id')
@@ -61,7 +67,9 @@ export class OrderController {
   @ApiResponse({ status: 404, description: 'Order not found' })
   async findOne(@Param('id') id: string) {
     const order = await this.ordersService.findOne(id);
-    return plainToInstance(OrderResponseDto, order);
+    return plainToInstance(OrderResponseDto, order, {
+      enableImplicitConversion: true,
+    });
   }
 
   @Patch(':id')
@@ -77,7 +85,9 @@ export class OrderController {
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
     const order = await this.ordersService.update(id, updateOrderDto);
-    return plainToInstance(OrderResponseDto, order);
+    return plainToInstance(OrderResponseDto, order, {
+      enableImplicitConversion: true,
+    });
   }
 
   @Delete(':id')

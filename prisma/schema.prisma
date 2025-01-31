@@ -132,7 +132,7 @@ model Order {
   responsibleUserId Int?
   responsibleUser   User?     @relation("ResponsibleUser", fields: [responsibleUserId], references: [id])
   price             Decimal   @default(0)
-  orderStatus       OrderStatus
+  orderStatus       OrderStatus @default(RECEIVED)
 
   @@map("order")
 }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CompanyType } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { PaginationMetaResponseDto } from 'src/common/dto/pagination-meta.response.dto';
 import { ObjectResponse } from 'src/common/interfaces/object';
@@ -14,6 +15,10 @@ export class ObjectResponseDto implements ObjectResponse {
   @Expose()
   @ApiProperty({ example: 'вул. Київська, 123' })
   address: string;
+
+  @Expose()
+  @ApiProperty({ example: 'ApartmentBuilding' })
+  type: string;
 
   @Expose()
   @ApiProperty({ example: '2024-03-20T10:00:00Z' })

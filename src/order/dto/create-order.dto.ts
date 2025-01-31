@@ -55,5 +55,6 @@ export class CreateOrderDto implements Order {
 
   @ApiProperty({ enum: OrderStatus, description: 'Order status' })
   @IsEnum(OrderStatus)
-  orderStatus: OrderStatus;
+  @IsOptional()
+  orderStatus?: OrderStatus;
 }
