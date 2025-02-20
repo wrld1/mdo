@@ -20,7 +20,7 @@ export class DwellingResponseDto implements DwellingResponse {
 
   @Expose()
   @ApiProperty({ example: 75.5 })
-  area: number;
+  floor: number;
 
   @Expose()
   @ApiProperty({ example: '2024-03-20T10:00:00Z' })

@@ -14,7 +14,7 @@ export interface DwellingResponse {
   id: number;
   name: string;
   number: string;
-  area: number;
+  floor: number;
   createdAt: Date;
   updatedAt: Date;
   user?: UserResponse;
