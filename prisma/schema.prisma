@@ -12,6 +12,7 @@ model User {
   email              String        @unique
   password           String
   name               String?
+  phoneNumber        String?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   isVerified         Boolean       @default(false)
@@ -77,6 +78,7 @@ model Dwelling {
   number   Int  @unique
   floor    Int?
   entrance Int?
+  square  Int?
 
   objectId        String
   object          Object            @relation(fields: [objectId], references: [id], onDelete: Cascade)

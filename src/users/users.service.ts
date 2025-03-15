@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,10 +14,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDataService } from './user-data.service';
 import { AclService } from 'src/acl/acl.service';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private companiesDataService: CompaniesDataService,
     private userCompanyDataService: UserCompanyDataService,
     private userDataService: UserDataService,

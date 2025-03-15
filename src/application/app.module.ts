@@ -13,12 +13,15 @@ import { ServiceModule } from 'src/service/service.module';
 import { DwellingModule } from 'src/dwelling/dwelling.module';
 import { DwellingServiceModule } from 'src/dwelling-service/dwelling-service.module';
 import { OrderModule } from 'src/order/order.module';
+import { WinstonModule } from 'nest-winston';
+import { loggerOptions } from 'src/logger.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
     }),
+    WinstonModule.forRoot(loggerOptions),
     AuthModule,
     EmailModule,
     UsersModule,
