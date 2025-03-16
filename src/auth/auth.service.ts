@@ -21,6 +21,8 @@ import { Mail } from 'src/common/enums/MailType';
 import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
 import { AclPermission } from 'src/common/enums/Permission';
 import { AclService } from 'src/acl/acl.service';
+import { randomInt } from 'crypto';
+import * as twilio from 'twilio';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +34,13 @@ export class AuthService {
     private emailService: EmailService,
     private alsProvider: AsyncLocalStorageProvider,
     private aclService: AclService,
-  ) {}
+    // private readonly twilioClient: TwilioCl,
+  ) {
+    // this.twilioClient = twilio(
+    //   process.env.TWILIO_ACCOUNT_SID,
+    //   process.env.TWILIO_AUTH_TOKEN,
+    // );
+  }
 
   async register(
     user: IUser,
@@ -259,4 +267,26 @@ export class AuthService {
       throw new BadRequestException(error);
     }
   }
+
+  private generateOtp(): string {
+    const otp = randomInt(100000, 999999).toString();
+    return otp;
+  }
+
+  // async sendOtp(phoneNumber: string) {
+  //   const otp = this.generateOtp();
+
+  //   try {
+  //     await this.twilioClient.messages.create({
+  //       body: `Your OTP is ${otp}`,
+  //       from: process.env.TWILIO_PHONE_NUMBER,
+  //       to: phoneNumber,
+  //     });
+
+  //     return otp; // Return OTP to save it for verification
+  //   } catch (error) {
+  //     console.error('Error sending OTP via SMS', error);
+  //     throw new Error('Failed to send OTP via SMS');
+  //   }
+  // }
 }

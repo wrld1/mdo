@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  LoggerService,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateAclDto } from 'src/acl/dto/create-acl.dto';
@@ -20,6 +21,7 @@ import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 export class UsersService {
   constructor(
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
     private companiesDataService: CompaniesDataService,
     private userCompanyDataService: UserCompanyDataService,
     private userDataService: UserDataService,
@@ -41,6 +43,7 @@ export class UsersService {
     const company = await this.companiesDataService.create({ code, type });
 
     await this.userCompanyDataService.create({ userId, companyId: company.id });
+
     return company;
   }
 
