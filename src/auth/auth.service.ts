@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -23,6 +24,7 @@ import { AclPermission } from 'src/common/enums/Permission';
 import { AclService } from 'src/acl/acl.service';
 import { randomInt } from 'crypto';
 import * as twilio from 'twilio';
+import { TWILIO_CLIENT } from 'src/providers/twilio/twilio.provider';
 
 @Injectable()
 export class AuthService {
@@ -34,13 +36,8 @@ export class AuthService {
     private emailService: EmailService,
     private alsProvider: AsyncLocalStorageProvider,
     private aclService: AclService,
-    // private readonly twilioClient: TwilioCl,
-  ) {
-    // this.twilioClient = twilio(
-    //   process.env.TWILIO_ACCOUNT_SID,
-    //   process.env.TWILIO_AUTH_TOKEN,
-    // );
-  }
+    @Inject(TWILIO_CLIENT) private readonly twilioClient,
+  ) {}
 
   async register(
     user: IUser,
@@ -273,20 +270,20 @@ export class AuthService {
     return otp;
   }
 
-  // async sendOtp(phoneNumber: string) {
-  //   const otp = this.generateOtp();
+  async sendOtp(phoneNumber: string) {
+    const otp = this.generateOtp();
 
-  //   try {
-  //     await this.twilioClient.messages.create({
-  //       body: `Your OTP is ${otp}`,
-  //       from: process.env.TWILIO_PHONE_NUMBER,
-  //       to: phoneNumber,
-  //     });
+    try {
+      await this.twilioClient.messages.create({
+        body: `Your OTP is ${otp}`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phoneNumber,
+      });
 
-  //     return otp; // Return OTP to save it for verification
-  //   } catch (error) {
-  //     console.error('Error sending OTP via SMS', error);
-  //     throw new Error('Failed to send OTP via SMS');
-  //   }
-  // }
+      return otp; // Return OTP to save it for verification
+    } catch (error) {
+      console.error('Error sending OTP via SMS', error);
+      throw new Error('Failed to send OTP via SMS');
+    }
+  }
 }

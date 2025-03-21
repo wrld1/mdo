@@ -146,16 +146,16 @@ export class AuthController {
     return await this.authService.sendVerificationLink(email);
   }
 
-  // @Public()
-  // @Get('send-otp')
-  // @ApiOperation({ summary: 'Send otp code' })
-  // // @ApiBody({ type: string })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Otp successfully sent',
-  // })
-  // @ApiResponse({ status: 400, description: 'Invalid reset token' })
-  // async sendOtp(@Body('phoneNumber') phoneNumber: string) {
-  //   return await this.authService.sendOtp(phoneNumber);
-  // }
+  @Public()
+  @Post('send-otp')
+  @ApiOperation({ summary: 'Send otp code' })
+  // @ApiBody({ type: string })
+  @ApiResponse({
+    status: 200,
+    description: 'Otp successfully sent',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid reset token' })
+  async sendOtp(@Body('phoneNumber') phoneNumber: string) {
+    return await this.authService.sendOtp(phoneNumber);
+  }
 }
