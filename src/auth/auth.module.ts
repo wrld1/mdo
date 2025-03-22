@@ -11,7 +11,7 @@ import { AuthService } from './auth.service';
 import { ConfigModule } from '@nestjs/config';
 import { EmailModule } from 'src/email/email.module';
 import { AclModule } from 'src/acl/acl.module';
-import { TwilioModule } from 'src/providers/twilio/twilio.module';
+import { SmsModule } from 'src/sms/sms.module';
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { TwilioModule } from 'src/providers/twilio/twilio.module';
     ConfigModule,
     EmailModule,
     AclModule,
-    TwilioModule,
+    SmsModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.accessSecret,

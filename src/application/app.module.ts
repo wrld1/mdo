@@ -15,6 +15,7 @@ import { DwellingServiceModule } from 'src/dwelling-service/dwelling-service.mod
 import { OrderModule } from 'src/order/order.module';
 import { WinstonModule } from 'nest-winston';
 import { loggerOptions } from 'src/logger.config';
+import { SmsModule } from 'src/sms/sms.module';
 import { TwilioModule } from 'src/providers/twilio/twilio.module';
 
 @Module({
@@ -35,6 +36,7 @@ import { TwilioModule } from 'src/providers/twilio/twilio.module';
     DwellingModule,
     DwellingServiceModule,
     TwilioModule,
+    SmsModule,
   ],
 })
 export class AppModule {

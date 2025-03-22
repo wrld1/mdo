@@ -23,8 +23,8 @@ import { CompanyTypeEnum } from 'src/common/enums/CompanyType';
 import { AclPermission } from 'src/common/enums/Permission';
 import { AclService } from 'src/acl/acl.service';
 import { randomInt } from 'crypto';
-import * as twilio from 'twilio';
-import { TWILIO_CLIENT } from 'src/providers/twilio/twilio.provider';
+import { SmsService } from 'src/sms/sms.service';
+import { AuthType } from 'src/common/enums/AuthType';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +36,7 @@ export class AuthService {
     private emailService: EmailService,
     private alsProvider: AsyncLocalStorageProvider,
     private aclService: AclService,
-    @Inject(TWILIO_CLIENT) private readonly twilioClient,
+    private readonly smsService: SmsService,
   ) {}
 
   async register(
@@ -272,18 +272,11 @@ export class AuthService {
 
   async sendOtp(phoneNumber: string) {
     const otp = this.generateOtp();
+    await this.smsService.sendSms(
+      phoneNumber,
+      `Your OTP code is: ${otp}. Valid for ${process.env.OTP_EXPIRY_TIME} minutes.`,
+    );
 
-    try {
-      await this.twilioClient.messages.create({
-        body: `Your OTP is ${otp}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneNumber,
-      });
-
-      return otp; // Return OTP to save it for verification
-    } catch (error) {
-      console.error('Error sending OTP via SMS', error);
-      throw new Error('Failed to send OTP via SMS');
-    }
+    return { success: true, message: 'OTP sent successfully' };
   }
 }
