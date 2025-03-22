@@ -8,6 +8,7 @@ import {
   MinLength,
   ValidateNested,
 } from 'class-validator';
+import { AuthType } from 'src/common/enums/AuthType';
 import { IUser } from 'src/common/interfaces/user';
 import { passwordRegex } from 'src/common/utils/constants';
 import { CreateCompanyDto } from 'src/companies/dto/create-company.dto';
@@ -18,7 +19,24 @@ export class CreateUserDto implements IUser {
     example: 'user@example.com',
   })
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
+
+  @ApiProperty({
+    description: 'The phone number of the user',
+    example: '+380501234567',
+  })
+  @IsString()
+  @IsOptional()
+  phoneNumber?: string;
+
+  @ApiProperty({
+    description: 'The phone number of the user',
+    example: '+380501234567',
+  })
+  @IsString()
+  @IsOptional()
+  authType: AuthType;
 
   @ApiProperty({
     description:

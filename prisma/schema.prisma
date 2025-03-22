@@ -9,13 +9,16 @@ datasource db {
 
 model User {
   id                 Int           @id @default(autoincrement())
-  email              String        @unique
+  email              String?        @unique
   password           String
   name               String?
-  phoneNumber        String?
+  phoneNumber        String?       @unique 
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
   isVerified         Boolean       @default(false)
+  authType                String?       @default("EMAIL")
+  phoneVerificationCode   String?
+  phoneVerificationExpires DateTime?
   refreshToken       String?
   fraudStatus        FraudStatus   @default(CLEAR)
   metadata           Json?         @db.JsonB

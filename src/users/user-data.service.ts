@@ -36,6 +36,12 @@ export class UserDataService {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
+  async findOneByPhone(phoneNumber: string) {
+    return this.prisma.user.findUnique({
+      where: { phoneNumber },
+    });
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     return this.prisma.user.update({
       where: { id },

@@ -83,6 +83,10 @@ export class UsersService {
     return await this.userDataService.findOneByEmail(email);
   }
 
+  async findOneByPhone(phoneNumber: string) {
+    return await this.userDataService.findOneByPhone(phoneNumber);
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       updateUserDto.password = await hashPassword(updateUserDto.password);

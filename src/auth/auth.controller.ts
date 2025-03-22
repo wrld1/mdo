@@ -48,9 +48,12 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @Post('sign-up')
   async register(@Body() createUserDto: CreateUserDto): Promise<void> {
-    const { email, password, company } = createUserDto;
+    const { email, password, company, authType } = createUserDto;
 
-    return await this.authService.register({ email, password }, company);
+    return await this.authService.register(
+      { email, password, authType },
+      company,
+    );
   }
 
   @Public()
@@ -63,8 +66,8 @@ export class AuthController {
     description: 'User successfully logged in.',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async login(@Body() { email, password }: LoginDto) {
-    return await this.authService.login(email, password);
+  async login(@Body() { identifier, password, authType }: LoginDto) {
+    return await this.authService.login(identifier, password, authType);
   }
 
   @Public()

@@ -1,4 +1,3 @@
-// src/sms/sms.service.abstract.ts
 import { Injectable } from '@nestjs/common';
 import { ISmsProvider } from 'src/common/interfaces/sms.provider';
 

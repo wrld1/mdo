@@ -1,14 +1,16 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { ILogin } from '../../common/interfaces/auth';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { AuthType } from 'src/common/enums/AuthType';
 
-export class LoginDto implements ILogin {
+export class LoginDto {
   @ApiProperty({
-    description: 'The email of the user',
-    example: 'user@example.com',
+    description: 'Identifier (email or phone number)',
+    example: 'user@example.com or +380501234567',
+    required: true,
   })
-  @IsEmail()
-  email: string;
+  @IsString()
+  @IsNotEmpty()
+  identifier: string;
 
   @ApiProperty({
     description: 'The password of the user',
@@ -18,4 +20,14 @@ export class LoginDto implements ILogin {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @ApiProperty({
+    description: 'Authentication type',
+    enum: AuthType,
+    example: AuthType.EMAIL,
+    required: true,
+  })
+  @IsEnum(AuthType)
+  @IsNotEmpty()
+  authType: AuthType;
 }

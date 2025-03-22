@@ -1,11 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsDateString,
   IsEmail,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
+import { AuthType } from 'src/common/enums/AuthType';
 
 export class UpdateUserDto {
   @ApiPropertyOptional({
@@ -26,6 +28,38 @@ export class UpdateUserDto {
   @MinLength(8)
   @IsOptional()
   password?: string;
+
+  @ApiPropertyOptional({
+    description: 'The phone number of the user',
+    example: '+380501234567',
+  })
+  @IsString()
+  @IsOptional()
+  phoneNumber?: string;
+
+  @ApiPropertyOptional({
+    description: 'The phone number of the user',
+    example: '+380501234567',
+  })
+  @IsString()
+  @IsOptional()
+  authType?: AuthType;
+
+  @ApiPropertyOptional({
+    description: 'Phone verification code for the user',
+    example: '232432535',
+  })
+  @IsString()
+  @IsOptional()
+  phoneVerificationCode?: string;
+
+  @ApiPropertyOptional({
+    description: 'Phone verification code expiration time',
+    example: '2024-03-22T15:30:00Z',
+  })
+  @IsOptional()
+  @IsDateString()
+  phoneVerificationExpires?: Date;
 
   @ApiPropertyOptional({
     description: 'Indicates whether the user is verified',

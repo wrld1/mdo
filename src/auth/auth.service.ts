@@ -46,10 +46,34 @@ export class AuthService {
       type: CompanyTypeEnum;
     },
   ): Promise<void> {
-    const existingUser = await this.usersService.findOneByEmail(user.email);
+    if (!user.authType || user.authType === AuthType.EMAIL) {
+      if (!user.email) {
+        throw new BadRequestException(
+          'Email is required for email authentication',
+        );
+      }
 
-    if (existingUser) {
-      throw new ConflictException('Користувач з таким email вже існує');
+      const existingUser = await this.usersService.findOneByEmail(user.email);
+      if (existingUser) {
+        throw new ConflictException('Користувач з таким email вже існує');
+      }
+    } else if (user.authType === AuthType.PHONE) {
+      if (!user.phoneNumber) {
+        throw new BadRequestException(
+          'Phone number is required for phone authentication',
+        );
+      }
+
+      const existingUser = await this.usersService.findOneByPhone(
+        user.phoneNumber,
+      );
+      if (existingUser) {
+        throw new ConflictException(
+          'Користувач з таким номером телефону вже існує',
+        );
+      }
+    } else {
+      throw new BadRequestException('Invalid authentication type');
     }
 
     const createdUser = await this.userDataService.create(user);
@@ -69,21 +93,82 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<AuthEntity> {
-    const user = await this.usersService.findOneByEmail(email);
+  async login(
+    identifier: string,
+    password: string,
+    authType: AuthType,
+  ): Promise<
+    AuthEntity | { success: boolean; message: string; userId: number }
+  > {
+    let user;
+
+    if (authType === AuthType.EMAIL) {
+      user = await this.usersService.findOneByEmail(identifier);
+    } else if (authType === AuthType.PHONE) {
+      user = await this.usersService.findOneByPhone(identifier);
+    } else {
+      throw new BadRequestException('Invalid authentication type');
+    }
 
     if (!user) {
-      throw new NotFoundException(`Невірна пошта або пароль`);
+      throw new NotFoundException(`Невірні дані для входу`);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Невірна пошта або пароль');
+      throw new UnauthorizedException('Невірні дані для входу');
     }
 
-    const { accessToken, refreshToken } = await this.createTokens(user.id);
+    if (authType === AuthType.EMAIL) {
+      const { accessToken, refreshToken } = await this.createTokens(user.id);
+      return { accessToken, refreshToken };
+    } else {
+      const otp = this.generateOtp();
+      await this.smsService.sendSms(
+        user.phoneNumber,
+        `Your OTP code is: ${otp}. Valid for ${process.env.OTP_EXPIRY_TIME} minutes.`,
+      );
 
+      await this.userDataService.update(user.id, {
+        phoneVerificationCode: otp,
+        phoneVerificationExpires: new Date(
+          Date.now() + parseInt(process.env.OTP_EXPIRY_TIME) * 60 * 1000,
+        ),
+      });
+
+      return {
+        success: true,
+        message: 'OTP sent successfully. Please verify to complete login.',
+        userId: user.id,
+      };
+    }
+  }
+
+  async verifyOtpAndLogin(
+    userId: number,
+    otpCode: string,
+  ): Promise<AuthEntity> {
+    const user = await this.usersService.findOne(userId);
+
+    if (!user) {
+      throw new NotFoundException('Користувач не знайдений');
+    }
+
+    if (user.phoneVerificationCode !== otpCode) {
+      throw new BadRequestException('Невірний код підтвердження');
+    }
+
+    if (new Date() > user.phoneVerificationExpires) {
+      throw new BadRequestException('Код підтвердження більше не дійсний');
+    }
+
+    await this.userDataService.update(user.id, {
+      isVerified: true,
+      phoneVerificationCode: null,
+      phoneVerificationExpires: null,
+    });
+
+    const { accessToken, refreshToken } = await this.createTokens(user.id);
     return { accessToken, refreshToken };
   }
 
