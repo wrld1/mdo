@@ -123,24 +123,42 @@ export class AuthService {
       const { accessToken, refreshToken } = await this.createTokens(user.id);
       return { accessToken, refreshToken };
     } else {
-      const otp = this.generateOtp();
-      await this.smsService.sendSms(
-        user.phoneNumber,
-        `Your OTP code is: ${otp}. Valid for ${process.env.OTP_EXPIRY_TIME} minutes.`,
-      );
+      try {
+        console.log('Attempting to send SMS verification...');
+        const otp = this.generateOtp();
 
-      await this.userDataService.update(user.id, {
-        phoneVerificationCode: otp,
-        phoneVerificationExpires: new Date(
-          Date.now() + parseInt(process.env.OTP_EXPIRY_TIME) * 60 * 1000,
-        ),
-      });
+        await this.smsService.sendSms(
+          user.phoneNumber,
+          `Your OTP code is: ${otp}. Valid for ${process.env.OTP_EXPIRY_TIME} minutes.`,
+        );
 
-      return {
-        success: true,
-        message: 'OTP sent successfully. Please verify to complete login.',
-        userId: user.id,
-      };
+        await this.userDataService.update(user.id, {
+          phoneVerificationCode: otp,
+          phoneVerificationExpires: new Date(
+            Date.now() + parseInt(process.env.OTP_EXPIRY_TIME) * 60 * 1000,
+          ),
+        });
+
+        return {
+          success: true,
+          message: 'OTP sent successfully. Please verify to complete login.',
+          userId: user.id,
+        };
+      } catch (error) {
+        console.error('SMS sending failed:', error);
+
+        if (error.code === 21614 || error.code === 21211) {
+          throw new BadRequestException('Invalid phone number format');
+        } else if (error.code === 20003) {
+          throw new InternalServerErrorException(
+            'SMS service configuration error',
+          );
+        } else {
+          throw new InternalServerErrorException(
+            'Failed to send verification code. Please try again later.',
+          );
+        }
+      }
     }
   }
 

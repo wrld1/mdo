@@ -48,10 +48,10 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @Post('sign-up')
   async register(@Body() createUserDto: CreateUserDto): Promise<void> {
-    const { email, password, company, authType } = createUserDto;
+    const { email, password, company, authType, phoneNumber } = createUserDto;
 
     return await this.authService.register(
-      { email, password, authType },
+      { email, password, authType, phoneNumber },
       company,
     );
   }
@@ -96,6 +96,44 @@ export class AuthController {
       console.log('error happened in controller', error);
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
+  }
+
+  @Post('verify-otp')
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify OTP and complete phone login' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'number', example: 1, description: 'User ID' },
+        otpCode: {
+          type: 'string',
+          example: '123456',
+          description: 'OTP code received via SMS',
+        },
+      },
+      required: ['userId', 'otpCode'],
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'OTP verification successful, returns auth tokens',
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: { type: 'string' },
+        refreshToken: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Invalid or expired OTP code' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async verifyOtp(
+    @Body('userId') userId: number,
+    @Body('otpCode') otpCode: string,
+  ) {
+    return this.authService.verifyOtpAndLogin(userId, otpCode);
   }
 
   @Public()
@@ -149,16 +187,16 @@ export class AuthController {
     return await this.authService.sendVerificationLink(email);
   }
 
-  @Public()
-  @Post('send-otp')
-  @ApiOperation({ summary: 'Send otp code' })
-  // @ApiBody({ type: string })
-  @ApiResponse({
-    status: 200,
-    description: 'Otp successfully sent',
-  })
-  @ApiResponse({ status: 400, description: 'Invalid reset token' })
-  async sendOtp(@Body('phoneNumber') phoneNumber: string) {
-    return await this.authService.sendOtp(phoneNumber);
-  }
+  // @Public()
+  // @Post('send-otp')
+  // @ApiOperation({ summary: 'Send otp code' })
+  // // @ApiBody({ type: string })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Otp successfully sent',
+  // })
+  // @ApiResponse({ status: 400, description: 'Invalid reset token' })
+  // async sendOtp(@Body('phoneNumber') phoneNumber: string) {
+  //   return await this.authService.sendOtp(phoneNumber);
+  // }
 }
