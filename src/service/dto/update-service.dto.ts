@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsInt } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateServiceDto {
@@ -46,4 +46,13 @@ export class UpdateServiceDto {
   @IsString()
   @IsOptional()
   objectId?: string;
+
+  @ApiProperty({
+    description: "Ідентифікатор пов'язаної квартири",
+    example: '2',
+    required: false,
+  })
+  @IsInt()
+  @IsOptional()
+  dwellingId?: string;
 }

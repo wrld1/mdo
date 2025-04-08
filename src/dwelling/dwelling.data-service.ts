@@ -62,6 +62,23 @@ export class DwellingDataService {
     });
   }
 
+  async connectService(dwellingId: number, serviceId: number) {
+    return this.prisma.dwelling.update({
+      where: { id: dwellingId },
+      data: {
+        services: {
+          connect: { id: serviceId },
+        },
+      },
+      include: {
+        object: true,
+        services: true,
+        DwellingService: true,
+        user: true,
+      },
+    });
+  }
+
   async remove(id: number) {
     return this.prisma.dwelling.delete({
       where: { id },

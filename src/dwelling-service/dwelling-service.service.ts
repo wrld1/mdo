@@ -67,10 +67,14 @@ export class DwellingServiceService {
         );
       }
 
-      return await this.dwellingServiceDataService.addService(
+      const dwellingService = await this.dwellingServiceDataService.addService(
         dwellingId,
         serviceId,
       );
+
+      await this.dwellingDataService.connectService(dwellingId, serviceId);
+
+      return dwellingService;
     } catch (error) {
       throw error;
     }

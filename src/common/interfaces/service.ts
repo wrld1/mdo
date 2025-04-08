@@ -13,7 +13,7 @@ export interface ServiceResponse {
   id: number;
   name: string;
   description: string;
-  price: number;
+  price: number | string;
   logo: string;
   objectId?: string;
   object?: ObjectResponse;

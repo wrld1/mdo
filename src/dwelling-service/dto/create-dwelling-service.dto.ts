@@ -16,7 +16,7 @@ export class CreateDwellingServiceDto {
 
   @ApiProperty({ example: 1000 })
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   amount?: number;
 
   @ApiProperty({

@@ -3,6 +3,7 @@ import { Exclude, Expose, Type } from 'class-transformer';
 import { UserResponseDto } from '../../users/dto/user-response.dto';
 import { ObjectResponseDto } from 'src/object/dto/object-response.dto';
 import { DwellingResponse } from 'src/common/interfaces/dwelling';
+import { ServiceResponseDto } from 'src/service/dto/service-response.dto';
 
 @Exclude()
 export class DwellingResponseDto implements DwellingResponse {
@@ -33,7 +34,7 @@ export class DwellingResponseDto implements DwellingResponse {
   @Expose()
   @Type(() => UserResponseDto)
   @ApiProperty({
-    type: UserResponseDto,
+    type: () => UserResponseDto,
     example: {
       id: 1,
       name: 'John Doe',
@@ -44,11 +45,19 @@ export class DwellingResponseDto implements DwellingResponse {
   @Expose()
   @Type(() => ObjectResponseDto)
   @ApiProperty({
-    type: () => [ObjectResponseDto],
+    type: () => ObjectResponseDto,
     example: {
       id: '123e4567-e89b-12d3-a456-426614174000',
       name: 'Building A',
     },
   })
   object: ObjectResponseDto;
+
+  // @Expose()
+  // @Type(() => ServiceResponseDto)
+  // @ApiProperty({
+  //   type: () => ServiceResponseDto,
+  //   isArray: true,
+  // })
+  // services: ServiceResponseDto[];
 }
