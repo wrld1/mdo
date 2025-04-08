@@ -5,6 +5,7 @@ import { UsersModule } from 'src/users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import { MailServiceFactory } from './email-factory.service';
 
 @Module({
   imports: [
@@ -36,7 +37,13 @@ import { join } from 'path';
       inject: [ConfigService],
     }),
   ],
-  providers: [EmailService],
+  providers: [
+    {
+      provide: 'MAIL_PROVIDER',
+      useFactory: () => MailServiceFactory.createMailService(),
+    },
+    EmailService,
+  ],
   exports: [EmailService],
 })
 export class EmailModule {}
