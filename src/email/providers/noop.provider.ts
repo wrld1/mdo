@@ -8,7 +8,6 @@ export class NoOpEmailService extends AbstractEmailService {
   async sendEmail(options: EmailOptions): Promise<boolean> {
     this.logger.log(`[NOOP] Would send email to: ${options.to}`);
     this.logger.log(`[NOOP] Subject: ${options.subject}`);
-    this.logger.log(`[NOOP] Content: ${options.text || options.html}`);
     return true;
   }
 }
