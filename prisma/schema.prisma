@@ -97,12 +97,12 @@ model DwellingService {
   status    DwellingServiceStatus
   createdAt DateTime              @default(now())
   updatedAt DateTime              @updatedAt
-  amount    Decimal               @default(0)
 
   dwelling   Dwelling @relation(fields: [dwellingId], references: [id], onDelete: Cascade)
   dwellingId Int
   service    Service  @relation(fields: [serviceId], references: [id])
   serviceId  Int
+  payments DwellingServicePayment[]
 }
 
 model Service {
@@ -117,6 +117,21 @@ model Service {
   dwelling        Dwelling?         @relation(fields: [dwellingId], references: [id])
   dwellingId      Int?
   DwellingService DwellingService[]
+}
+
+ model DwellingServicePayment {
+  id               Int       @id @default(autoincrement())
+  startDate        DateTime 
+  endDate          DateTime
+  amount           Decimal
+  counter          Decimal
+  status           DwellingServicePaymentStatus
+  paymentDate      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  dwellingService   DwellingService @relation(fields: [dwellingServiceId], references: [id], onDelete: Cascade)
+  dwellingServiceId Int
 }
 
 model Order {
@@ -188,5 +203,12 @@ enum OrderType {
   ELECTRICITY
   WATER
   GAS
+  ORGANIZATION
   OTHER
+}
+
+enum DwellingServicePaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
 }
