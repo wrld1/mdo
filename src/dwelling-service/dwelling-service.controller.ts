@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   Delete,
+  Get,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { DwellingServiceService } from './dwelling-service.service';
@@ -18,6 +19,29 @@ export class DwellingServiceController {
   constructor(
     private readonly dwellingServiceService: DwellingServiceService,
   ) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all dwelling services' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all dwelling services.',
+  })
+  async findAll() {
+    return await this.dwellingServiceService.findAll();
+  }
+
+  // @Get('dwelling/:dwellingId')
+  // @ApiOperation({ summary: 'Get all services for a specific dwelling' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'List of services for the specified dwelling.',
+  // })
+  // @ApiResponse({ status: 404, description: 'Dwelling not found' })
+  // async findAllByDwelling(
+  //   @Param('dwellingId', ParseIntPipe) dwellingId: number,
+  // ) {
+  //   return await this.dwellingServiceService.findAll();
+  // }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update dwelling service status or amount' })

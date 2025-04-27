@@ -61,8 +61,10 @@ export class DwellingController {
     @Query('services') services?: string,
   ) {
     if (services === 'true') {
+      console.log('Fetching dwelling services');
       return await this.dwellingService.getDwellingServices(id);
     }
+
     const dwelling = await this.dwellingService.findOne(id);
     return plainToInstance(DwellingResponseDto, dwelling);
   }

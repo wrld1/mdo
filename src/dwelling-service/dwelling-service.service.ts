@@ -21,6 +21,15 @@ export class DwellingServiceService {
     private aclService: AclService,
   ) {}
 
+  async findAll() {
+    try {
+      const data = await this.dwellingServiceDataService.findAll();
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async update(id: number, { status, amount }: UpdateDwellingServiceDto) {
     try {
       const existingService =

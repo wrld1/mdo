@@ -1,0 +1,232 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table user {
+  id Int [pk, increment]
+  email String [unique]
+  password String [not null]
+  name String
+  phoneNumber String [unique]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  isVerified Boolean [not null, default: false]
+  authType String [default: 'EMAIL']
+  phoneVerificationCode String
+  phoneVerificationExpires DateTime
+  refreshToken String
+  fraudStatus FraudStatus [not null, default: 'CLEAR']
+  metadata Json
+  acl Acl [not null]
+  companies UserCompany [not null]
+  dwelling Dwelling [not null]
+  orders order [not null]
+  responsibleOrders order [not null]
+}
+
+Table Acl {
+  id Int [pk, increment]
+  userId Int [not null]
+  resource String [not null]
+  permission AclPermission [not null]
+  user user [not null]
+}
+
+Table company {
+  id String [pk]
+  name String
+  code Int [not null]
+  type CompanyType [not null]
+  status CompanyStatus [not null, default: 'PENDING']
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  objects Object [not null]
+  users UserCompany [not null]
+  orders order [not null]
+}
+
+Table UserCompany {
+  id Int [pk, increment]
+  userId Int [not null]
+  companyId String [not null]
+  company company [not null]
+  user user [not null]
+
+  indexes {
+    (userId, companyId) [unique]
+  }
+}
+
+Table Object {
+  id String [pk]
+  address String [not null]
+  type ObjectType [not null]
+  company company
+  companyId String
+  services Service [not null]
+  dwelling Dwelling [not null]
+  orders order [not null]
+}
+
+Table Dwelling {
+  id Int [pk, increment]
+  number Int [unique, not null]
+  floor Int
+  entrance Int
+  square Int
+  objectId String [not null]
+  object Object [not null]
+  userId Int
+  user user
+  services Service [not null]
+  DwellingService DwellingService [not null]
+  orders order [not null]
+}
+
+Table DwellingService {
+  id Int [pk, increment]
+  status DwellingServiceStatus [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  dwelling Dwelling [not null]
+  dwellingId Int [not null]
+  service Service [not null]
+  serviceId Int [not null]
+  payments DwellingServicePayment [not null]
+}
+
+Table Service {
+  id Int [pk, increment]
+  name String [not null]
+  description String [not null]
+  price Decimal [not null]
+  logo String [not null]
+  object Object
+  objectId String
+  dwelling Dwelling
+  dwellingId Int
+  DwellingService DwellingService [not null]
+}
+
+Table DwellingServicePayment {
+  id Int [pk, increment]
+  startDate DateTime [not null]
+  endDate DateTime [not null]
+  amount Decimal [not null]
+  counter Decimal [not null]
+  status DwellingServicePaymentStatus [not null]
+  paymentDate DateTime
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  dwellingService DwellingService [not null]
+  dwellingServiceId Int [not null]
+}
+
+Table order {
+  id String [pk]
+  name String [not null]
+  type OrderType [not null]
+  description String [not null]
+  objectId String [not null]
+  object Object [not null]
+  dwellingId Int
+  dwelling Dwelling
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  userId Int [not null]
+  user user [not null]
+  companyId String [not null]
+  company company [not null]
+  responsibleUserId Int
+  responsibleUser user
+  price Decimal [not null, default: 0]
+  orderStatus OrderStatus [not null, default: 'RECEIVED']
+}
+
+Enum CompanyType {
+  OSBB
+  ManagingCompany
+  CottageTown
+}
+
+Enum AclPermission {
+  READ
+  WRITE
+}
+
+Enum CompanyStatus {
+  PENDING
+  PROCESSED
+  INACTIVE
+  BLOCKED
+}
+
+Enum ObjectType {
+  ApartmentBuilding
+}
+
+Enum FraudStatus {
+  CLEAR
+  SUSPENDED
+  BLOCKED
+}
+
+Enum DwellingServiceStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+Enum OrderStatus {
+  RECEIVED
+  IN_PROGRESS
+  FINISHED
+  BLOCKED
+  INVALID
+}
+
+Enum OrderType {
+  ELECTRICITY
+  WATER
+  GAS
+  ORGANIZATION
+  OTHER
+}
+
+Enum DwellingServicePaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+Ref: Acl.userId > user.id [delete: Cascade]
+
+Ref: UserCompany.companyId > company.id
+
+Ref: UserCompany.userId > user.id
+
+Ref: Object.companyId > company.id
+
+Ref: Dwelling.objectId > Object.id [delete: Cascade]
+
+Ref: Dwelling.userId > user.id
+
+Ref: DwellingService.dwellingId > Dwelling.id [delete: Cascade]
+
+Ref: DwellingService.serviceId > Service.id
+
+Ref: Service.objectId > Object.id
+
+Ref: Service.dwellingId > Dwelling.id
+
+Ref: DwellingServicePayment.dwellingServiceId > DwellingService.id [delete: Cascade]
+
+Ref: order.objectId > Object.id
+
+Ref: order.dwellingId > Dwelling.id
+
+Ref: order.userId > user.id
+
+Ref: order.companyId > company.id
+
+Ref: order.responsibleUserId > user.id

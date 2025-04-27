@@ -14,16 +14,13 @@ export class UpdateOrderDto implements OrderUpdate {
   @ApiPropertyOptional({ description: 'Order description' })
   @IsString()
   @MinLength(3)
-  description: string;
+  @IsOptional()
+  description?: string;
 
   @ApiPropertyOptional({ description: 'Responsible User ID' })
   @IsInt()
   @IsOptional()
   responsibleUserId?: number;
-
-  @ApiProperty({ description: 'Order Id' })
-  @IsString()
-  id: string;
 
   @ApiPropertyOptional({ description: 'Order price' })
   @IsOptional()

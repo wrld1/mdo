@@ -4,7 +4,12 @@ import { UserResponse } from './user';
 import { Decimal } from '@prisma/client/runtime/library';
 import { ObjectResponse } from './object';
 
-export type OrderType = 'ELECTRICITY' | 'WATER' | 'GAS' | 'OTHER';
+export type OrderType =
+  | 'ELECTRICITY'
+  | 'WATER'
+  | 'GAS'
+  | 'ORGANIZATION'
+  | 'OTHER';
 export type OrderStatus =
   | 'RECEIVED'
   | 'IN_PROGRESS'
@@ -40,9 +45,8 @@ export interface OrderResponse {
   orderStatus: OrderStatus;
 }
 
-export interface OrderUpdate
-  extends Pick<Order, 'responsibleUserId' | 'description'> {
-  id: string;
+export interface OrderUpdate extends Pick<Order, 'responsibleUserId'> {
   price?: number;
   orderStatus?: OrderStatus;
+  description?: string;
 }

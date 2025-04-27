@@ -6,10 +6,14 @@ import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
 export class DwellingServiceDataService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll() {
+    return this.prisma.dwellingService.findMany();
+  }
+
   async update(id: number, { status, amount }: UpdateDwellingServiceDto) {
     return await this.prisma.dwellingService.update({
       where: { id },
-      data: { status, amount },
+      data: { status },
     });
   }
 
@@ -21,13 +25,6 @@ export class DwellingServiceDataService {
         ...service,
         status: 'ACTIVE',
       })),
-    });
-  }
-
-  async updateAmount(id: number, amount: number) {
-    return await this.prisma.dwellingService.update({
-      where: { id },
-      data: { amount },
     });
   }
 
@@ -57,6 +54,7 @@ export class DwellingServiceDataService {
         dwellingId,
       },
       include: {
+        dwelling: true,
         service: true,
       },
     });
