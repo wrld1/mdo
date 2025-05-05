@@ -1,13 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class DwellingServiceDataService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
-    return this.prisma.dwellingService.findMany();
+  async findAll(params?: {
+    where?: Prisma.DwellingServiceWhereInput;
+    orderBy?: Prisma.DwellingServiceOrderByWithRelationInput;
+    include?: Prisma.DwellingServiceInclude;
+  }) {
+    const { where, orderBy, include } = params || {};
+    return this.prisma.dwellingService.findMany({
+      where,
+      orderBy,
+      include: include ?? {
+        dwelling: true,
+        service: true,
+        payments: true,
+      },
+    });
   }
 
   async update(id: number, { status, amount }: UpdateDwellingServiceDto) {

@@ -10,6 +10,9 @@ import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
 import { DwellingDataService } from 'src/dwelling/dwelling.data-service';
 import { AclService } from 'src/acl/acl.service';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
+import { Prisma } from '@prisma/client';
+import { CreateServicePaymentDto } from 'src/service-payment/dto/create-service-payment.dto';
+import { ServicePaymentDataService } from 'src/service-payment/service-payment.data-service';
 
 @Injectable()
 export class DwellingServiceService {
@@ -19,12 +22,32 @@ export class DwellingServiceService {
     private serviceService: ServiceService,
     private alsProvider: AsyncLocalStorageProvider,
     private aclService: AclService,
+    private servicePaymentDataService: ServicePaymentDataService,
   ) {}
 
-  async findAll() {
+  async findAll(params?: {
+    where?: Prisma.DwellingServiceWhereInput;
+    orderBy?: Prisma.DwellingServiceOrderByWithRelationInput;
+    include?: Prisma.DwellingServiceInclude;
+  }) {
     try {
-      const data = await this.dwellingServiceDataService.findAll();
-      return data;
+      const data = await this.dwellingServiceDataService.findAll(params);
+
+      return data.map((dwellingService) => {
+        const priceAsNumber =
+          dwellingService.service?.price?.toNumber() ?? null;
+
+        return {
+          ...dwellingService,
+
+          service: dwellingService.service
+            ? {
+                ...dwellingService.service,
+                price: priceAsNumber,
+              }
+            : null,
+        };
+      });
     } catch (error) {
       throw error;
     }
@@ -123,6 +146,62 @@ export class DwellingServiceService {
         serviceId,
       );
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async addPayment(
+    dwellingServiceId: number,
+    paymentDto: CreateServicePaymentDto,
+  ) {
+    try {
+      const dwellingService =
+        await this.dwellingServiceDataService.findById(dwellingServiceId);
+      if (!dwellingService) {
+        throw new NotFoundException(
+          `DwellingService with ID ${dwellingServiceId} not found.`,
+        );
+      }
+
+      const dwelling = await this.dwellingDataService.find({
+        where: { id: dwellingService.dwellingId },
+      });
+      if (
+        !dwelling ||
+        dwelling.length === 0 ||
+        !dwelling[0].object?.companyId
+      ) {
+        throw new NotFoundException(
+          `Associated dwelling or company not found for DwellingService ID ${dwellingServiceId}.`,
+        );
+      }
+      const userId = this.alsProvider.get('uId');
+      if (!userId) {
+        throw new ForbiddenException('User ID not found in request context.');
+      }
+      const companyId = dwelling[0].object.companyId;
+      const canAddPayment = await this.aclService.checkPermission(userId, [
+        `/companyManagement/${companyId}`,
+        'admin',
+      ]);
+
+      if (!canAddPayment) {
+        throw new ForbiddenException(
+          'User does not have permission to add payments for this service.',
+        );
+      }
+
+      const newPayment = await this.servicePaymentDataService.create(
+        dwellingServiceId,
+        paymentDto,
+      );
+
+      return newPayment;
+    } catch (error) {
+      console.error(
+        `Error adding payment for DwellingService ${dwellingServiceId}:`,
+        error,
+      );
       throw error;
     }
   }

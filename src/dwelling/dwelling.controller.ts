@@ -61,7 +61,6 @@ export class DwellingController {
     @Query('services') services?: string,
   ) {
     if (services === 'true') {
-      console.log('Fetching dwelling services');
       return await this.dwellingService.getDwellingServices(id);
     }
 
