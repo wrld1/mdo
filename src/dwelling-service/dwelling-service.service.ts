@@ -86,6 +86,18 @@ export class DwellingServiceService {
         throw new NotFoundException(`Сервіс не знайдено`);
       }
 
+      const existingDwellingService =
+        await this.dwellingServiceDataService.findAll({
+          where: {
+            dwellingId: dwellingId,
+            serviceId: serviceId,
+          },
+        });
+
+      if (existingDwellingService && existingDwellingService.length > 0) {
+        throw new ForbiddenException(`Сервіс вже додано до цієї квартири.`);
+      }
+
       const userId = this.alsProvider.get('uId');
 
       const canUpdate = await this.aclService.checkPermission(userId, [
