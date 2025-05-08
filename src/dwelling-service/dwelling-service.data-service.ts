@@ -7,6 +7,17 @@ import { Prisma } from '@prisma/client';
 export class DwellingServiceDataService {
   constructor(private prisma: PrismaService) {}
 
+  async findById(id: number, include?: Prisma.DwellingServiceInclude) {
+    return await this.prisma.dwellingService.findUnique({
+      where: { id },
+      include: include ?? {
+        dwelling: true,
+        service: true,
+        payments: true,
+      },
+    });
+  }
+
   async findAll(params?: {
     where?: Prisma.DwellingServiceWhereInput;
     orderBy?: Prisma.DwellingServiceOrderByWithRelationInput;
@@ -39,12 +50,6 @@ export class DwellingServiceDataService {
         ...service,
         status: 'ACTIVE',
       })),
-    });
-  }
-
-  async findById(id: number) {
-    return await this.prisma.dwellingService.findUnique({
-      where: { id },
     });
   }
 

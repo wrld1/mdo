@@ -31,6 +31,17 @@ export class DwellingServiceController {
     return await this.dwellingServiceService.findAll();
   }
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a specific dwelling service by its ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The dwelling service record.',
+  })
+  @ApiResponse({ status: 404, description: 'DwellingService not found' })
+  async findOneById(@Param('id', ParseIntPipe) id: number) {
+    return await this.dwellingServiceService.findOneById(id);
+  }
+
   @Get('dwelling/:dwellingId')
   @ApiOperation({ summary: 'Get all services for a specific dwelling' })
   @ApiResponse({

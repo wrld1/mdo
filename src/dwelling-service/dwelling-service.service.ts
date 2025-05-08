@@ -37,7 +37,7 @@ export class DwellingServiceService {
         const priceAsNumber =
           dwellingService.service?.price?.toNumber() ?? null;
 
-        return {
+        const dwellingServiceRes = {
           ...dwellingService,
 
           service: dwellingService.service
@@ -47,8 +47,38 @@ export class DwellingServiceService {
               }
             : null,
         };
+
+        console.log(dwellingServiceRes, 'dwellingServiceRes');
+
+        return dwellingServiceRes;
       });
     } catch (error) {
+      throw error;
+    }
+  }
+
+  async findOneById(id: number) {
+    try {
+      const dwellingService =
+        await this.dwellingServiceDataService.findById(id);
+
+      if (!dwellingService) {
+        throw new NotFoundException(`DwellingService with ID ${id} not found.`);
+      }
+
+      const priceAsNumber = dwellingService.service?.price?.toNumber() ?? null;
+
+      return {
+        ...dwellingService,
+        service: dwellingService.service
+          ? {
+              ...dwellingService.service,
+              price: priceAsNumber,
+            }
+          : null,
+      };
+    } catch (error) {
+      console.error(`Error fetching DwellingService with ID ${id}:`, error);
       throw error;
     }
   }
