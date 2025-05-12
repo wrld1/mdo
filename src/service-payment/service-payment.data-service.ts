@@ -13,7 +13,7 @@ export class ServicePaymentDataService {
       endDate: new Date(data.endDate),
       amount: data.amount,
       counter: data.counter,
-      status: data.status,
+      status: data.status || 'PENDING',
       dwellingService: {
         connect: { id: dwellingServiceId },
       },

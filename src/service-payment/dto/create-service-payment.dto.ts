@@ -31,8 +31,8 @@ export class CreateServicePaymentDto {
   @ApiProperty({ example: '150.75', description: 'Amount due for the period' })
   @IsNumber({ maxDecimalPlaces: 2 })
   @Type(() => Number)
-  @IsNotEmpty()
-  amount: number;
+  @IsOptional()
+  amount?: number;
 
   @ApiProperty({
     example: '1234.5',

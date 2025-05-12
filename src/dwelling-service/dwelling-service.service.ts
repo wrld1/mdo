@@ -10,7 +10,7 @@ import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
 import { DwellingDataService } from 'src/dwelling/dwelling.data-service';
 import { AclService } from 'src/acl/acl.service';
 import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
-import { Prisma } from '@prisma/client';
+import { DwellingServicePaymentStatus, Prisma } from '@prisma/client';
 import { CreateServicePaymentDto } from 'src/service-payment/dto/create-service-payment.dto';
 import { ServicePaymentDataService } from 'src/service-payment/service-payment.data-service';
 
@@ -199,15 +199,27 @@ export class DwellingServiceService {
     try {
       const dwellingService =
         await this.dwellingServiceDataService.findById(dwellingServiceId);
+
       if (!dwellingService) {
         throw new NotFoundException(
           `DwellingService with ID ${dwellingServiceId} not found.`,
         );
       }
 
+      if (
+        !dwellingService.service ||
+        dwellingService.service.price === null ||
+        dwellingService.service.price === undefined
+      ) {
+        throw new NotFoundException(
+          `Service details or price not found for DwellingService ID ${dwellingServiceId}. Cannot calculate payment amount.`,
+        );
+      }
+
       const dwelling = await this.dwellingDataService.find({
         where: { id: dwellingService.dwellingId },
       });
+
       if (
         !dwelling ||
         dwelling.length === 0 ||
@@ -217,10 +229,12 @@ export class DwellingServiceService {
           `Associated dwelling or company not found for DwellingService ID ${dwellingServiceId}.`,
         );
       }
+
       const userId = this.alsProvider.get('uId');
       if (!userId) {
         throw new ForbiddenException('User ID not found in request context.');
       }
+
       const companyId = dwelling[0].object.companyId;
       const canAddPayment = await this.aclService.checkPermission(userId, [
         `/companyManagement/${companyId}`,
@@ -233,9 +247,20 @@ export class DwellingServiceService {
         );
       }
 
+      const servicePrice = dwellingService.service.price;
+      const counterValue = paymentDto.counter;
+
+      const calculatedAmountDecimal = servicePrice.mul(counterValue);
+
+      const paymentDataForCreation: CreateServicePaymentDto = {
+        ...paymentDto,
+        amount: calculatedAmountDecimal.toNumber(),
+        status: paymentDto.status || DwellingServicePaymentStatus.PENDING,
+      };
+
       const newPayment = await this.servicePaymentDataService.create(
         dwellingServiceId,
-        paymentDto,
+        paymentDataForCreation,
       );
 
       return newPayment;
