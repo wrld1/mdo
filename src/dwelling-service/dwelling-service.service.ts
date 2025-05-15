@@ -67,9 +67,16 @@ export class DwellingServiceService {
       }
 
       const priceAsNumber = dwellingService.service?.price?.toNumber() ?? null;
+      const payments =
+        dwellingService.payments?.map((payment) => ({
+          ...payment,
+          amount: payment.amount?.toNumber?.() ?? payment.amount ?? null,
+          counter: payment.counter?.toNumber?.() ?? payment.counter ?? null,
+        })) ?? [];
 
       return {
         ...dwellingService,
+        payments,
         service: dwellingService.service
           ? {
               ...dwellingService.service,
