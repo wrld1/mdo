@@ -82,7 +82,7 @@ model Object {
 
 model Dwelling {
   id       Int  @id @default(autoincrement())
-  number   Int  @unique
+  number   Int  
   floor    Int?
   entrance Int?
   square  Int?

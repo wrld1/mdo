@@ -13,6 +13,7 @@ import { DwellingServiceService } from './dwelling-service.service';
 import { CreateDwellingServiceDto } from './dto/create-dwelling-service.dto';
 import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
 import { CreateServicePaymentDto } from 'src/service-payment/dto/create-service-payment.dto';
+import { AddPaymentsRequestDto } from './dto/add-payment-request.dto';
 
 @ApiTags('Dwelling-services')
 @Controller('dwelling-services')
@@ -55,26 +56,38 @@ export class DwellingServiceController {
     return await this.dwellingServiceService.findAll({ where: { dwellingId } });
   }
 
-  @Post(':dwellingServiceId/payments')
-  @ApiOperation({ summary: 'Add a payment record for a dwelling service' })
-  @ApiBody({ type: CreateServicePaymentDto })
+  @Post('payments')
+  @ApiOperation({
+    summary:
+      'Add one or more payment records for a dwelling service. Identify DwellingService by dwellingServiceId OR (dwellingId AND serviceId) in the body.',
+  })
+  @ApiBody({
+    description:
+      'Payment details including identification of the DwellingService and an array of payments to be created.',
+    type: AddPaymentsRequestDto,
+  })
   @ApiResponse({
     status: 201,
-    description: 'Payment record successfully created.',
+    description:
+      'Payment records successfully created. Returns count of created payments.',
+    type: () => ({ message: String, count: Number }),
   })
-  @ApiResponse({ status: 404, description: 'DwellingService not found' })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Invalid input data (e.g., missing identification or empty payments array)',
+  })
+  @ApiResponse({
+    status: 404,
+    description:
+      'DwellingService, Dwelling, or Service not found based on provided IDs',
+  })
   @ApiResponse({
     status: 403,
     description: 'Forbidden - User lacks permission',
   })
-  async addPayment(
-    @Param('dwellingServiceId', ParseIntPipe) dwellingServiceId: number,
-    @Body() paymentDto: CreateServicePaymentDto,
-  ) {
-    return await this.dwellingServiceService.addPayment(
-      dwellingServiceId,
-      paymentDto,
-    );
+  async addPayments(@Body() addPaymentsDto: AddPaymentsRequestDto) {
+    return await this.dwellingServiceService.addPayment(addPaymentsDto);
   }
 
   @Patch(':id')

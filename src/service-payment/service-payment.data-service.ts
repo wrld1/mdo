@@ -23,4 +23,13 @@ export class ServicePaymentDataService {
       data: createData,
     });
   }
+
+  async createManyPayments(
+    paymentsData: Prisma.DwellingServicePaymentCreateManyInput[],
+  ) {
+    return this.prisma.dwellingServicePayment.createMany({
+      data: paymentsData,
+      skipDuplicates: false,
+    });
+  }
 }

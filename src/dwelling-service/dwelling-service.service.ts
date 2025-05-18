@@ -13,6 +13,7 @@ import { AsyncLocalStorageProvider } from 'src/providers/als/als.provider';
 import { DwellingServicePaymentStatus, Prisma } from '@prisma/client';
 import { CreateServicePaymentDto } from 'src/service-payment/dto/create-service-payment.dto';
 import { ServicePaymentDataService } from 'src/service-payment/service-payment.data-service';
+import { AddPaymentsRequestDto } from './dto/add-payment-request.dto';
 
 @Injectable()
 export class DwellingServiceService {
@@ -47,8 +48,6 @@ export class DwellingServiceService {
               }
             : null,
         };
-
-        console.log(dwellingServiceRes, 'dwellingServiceRes');
 
         return dwellingServiceRes;
       });
@@ -199,83 +198,107 @@ export class DwellingServiceService {
     }
   }
 
-  async addPayment(
-    dwellingServiceId: number,
-    paymentDto: CreateServicePaymentDto,
-  ) {
+  async addPayment(dto: AddPaymentsRequestDto) {
     try {
-      const dwellingService =
-        await this.dwellingServiceDataService.findById(dwellingServiceId);
+      const specificInclude = {
+        service: true,
+        dwelling: { include: { object: { select: { companyId: true } } } },
+      } as const;
 
-      if (!dwellingService) {
-        throw new NotFoundException(
-          `DwellingService with ID ${dwellingServiceId} not found.`,
+      let targetDwellingService;
+
+      if (dto.dwellingServiceId) {
+        const ds = await this.dwellingServiceDataService.findById(
+          dto.dwellingServiceId,
+          specificInclude,
+        );
+        if (!ds) {
+          throw new NotFoundException(
+            `DwellingService with ID ${dto.dwellingServiceId} not found.`,
+          );
+        }
+        targetDwellingService = ds;
+      } else if (dto.dwellingId && dto.serviceId) {
+        const dwellingServices = await this.dwellingServiceDataService.findAll({
+          where: {
+            dwellingId: dto.dwellingId,
+            serviceId: dto.serviceId,
+          },
+          include: specificInclude,
+        });
+        if (!dwellingServices || dwellingServices.length === 0) {
+          throw new NotFoundException(
+            `DwellingService not found for Dwelling ID ${dto.dwellingId} and Service ID ${dto.serviceId}.`,
+          );
+        }
+        targetDwellingService = dwellingServices[0];
+      } else {
+        throw new ForbiddenException(
+          'Either dwellingServiceId or both dwellingId and serviceId must be provided.',
         );
       }
 
-      if (
-        !dwellingService.service ||
-        dwellingService.service.price === null ||
-        dwellingService.service.price === undefined
-      ) {
+      if (!targetDwellingService.dwelling?.object?.companyId) {
         throw new NotFoundException(
-          `Service details or price not found for DwellingService ID ${dwellingServiceId}. Cannot calculate payment amount.`,
+          `Associated company not found for the DwellingService.`,
         );
       }
-
-      const dwelling = await this.dwellingDataService.find({
-        where: { id: dwellingService.dwellingId },
-      });
-
-      if (
-        !dwelling ||
-        dwelling.length === 0 ||
-        !dwelling[0].object?.companyId
-      ) {
-        throw new NotFoundException(
-          `Associated dwelling or company not found for DwellingService ID ${dwellingServiceId}.`,
-        );
-      }
-
       const userId = this.alsProvider.get('uId');
       if (!userId) {
         throw new ForbiddenException('User ID not found in request context.');
       }
+      const companyId = targetDwellingService.dwelling.object.companyId;
+      const canAddPaymentPermission = await this.aclService.checkPermission(
+        userId,
+        [`/companyManagement/${companyId}`, 'admin'],
+      );
 
-      const companyId = dwelling[0].object.companyId;
-      const canAddPayment = await this.aclService.checkPermission(userId, [
-        `/companyManagement/${companyId}`,
-        'admin',
-      ]);
-
-      if (!canAddPayment) {
+      if (!canAddPaymentPermission) {
         throw new ForbiddenException(
           'User does not have permission to add payments for this service.',
         );
       }
 
-      const servicePrice = dwellingService.service.price;
-      const counterValue = paymentDto.counter;
+      if (
+        !targetDwellingService.service ||
+        targetDwellingService.service.price === null ||
+        targetDwellingService.service.price === undefined
+      ) {
+        throw new NotFoundException(
+          `Service details or price not found for DwellingService ID ${targetDwellingService.id}. Cannot calculate payment amounts.`,
+        );
+      }
+      const servicePrice = targetDwellingService.service.price;
 
-      const calculatedAmountDecimal = servicePrice.mul(counterValue);
+      const paymentsToCreate: Prisma.DwellingServicePaymentCreateManyInput[] =
+        dto.payments.map((paymentDto) => {
+          const counterValue = paymentDto.counter;
+          const calculatedAmountDecimal = servicePrice.mul(counterValue);
 
-      const paymentDataForCreation: CreateServicePaymentDto = {
-        ...paymentDto,
-        amount: calculatedAmountDecimal.toNumber(),
-        status: paymentDto.status || DwellingServicePaymentStatus.PENDING,
+          return {
+            dwellingServiceId: targetDwellingService.id,
+            startDate: new Date(paymentDto.startDate),
+            endDate: new Date(paymentDto.endDate),
+            amount: calculatedAmountDecimal,
+            counter: paymentDto.counter,
+            status: paymentDto.status || DwellingServicePaymentStatus.PENDING,
+          };
+        });
+
+      if (paymentsToCreate.length === 0) {
+        return { message: 'No payments to create.', count: 0 };
+      }
+
+      const result =
+        await this.servicePaymentDataService.createManyPayments(
+          paymentsToCreate,
+        );
+      return {
+        message: `${result.count} payment(s) created successfully.`,
+        count: result.count,
       };
-
-      const newPayment = await this.servicePaymentDataService.create(
-        dwellingServiceId,
-        paymentDataForCreation,
-      );
-
-      return newPayment;
     } catch (error) {
-      console.error(
-        `Error adding payment for DwellingService ${dwellingServiceId}:`,
-        error,
-      );
+      console.error(`Error in addPayment:`, error);
       throw error;
     }
   }

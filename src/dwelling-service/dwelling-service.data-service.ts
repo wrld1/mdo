@@ -11,7 +11,11 @@ export class DwellingServiceDataService {
     return await this.prisma.dwellingService.findUnique({
       where: { id },
       include: include ?? {
-        dwelling: true,
+        dwelling: {
+          include: {
+            object: true,
+          },
+        },
         service: true,
         payments: true,
       },
