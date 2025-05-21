@@ -125,8 +125,8 @@ model Service {
 
  model DwellingServicePayment {
   id               Int       @id @default(autoincrement())
-  startDate        DateTime 
-  endDate          DateTime
+  month             Int      
+  year              Int 
   amount           Decimal
   counter          Decimal
   status           DwellingServicePaymentStatus

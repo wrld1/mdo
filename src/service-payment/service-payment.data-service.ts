@@ -9,8 +9,8 @@ export class ServicePaymentDataService {
 
   async create(dwellingServiceId: number, data: CreateServicePaymentDto) {
     const createData = {
-      startDate: new Date(data.startDate),
-      endDate: new Date(data.endDate),
+      month: data.month,
+      year: data.year,
       amount: data.amount,
       counter: data.counter,
       status: data.status || 'PENDING',

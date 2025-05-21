@@ -120,7 +120,7 @@ export class AuthService {
     }
 
     if (authType === AuthType.EMAIL) {
-      const { accessToken, refreshToken } = await this.createTokens(user.id);
+      const { accessToken, refreshToken } = await this.createTokens(user);
       return { accessToken, refreshToken };
     } else {
       try {
@@ -186,7 +186,7 @@ export class AuthService {
       phoneVerificationExpires: null,
     });
 
-    const { accessToken, refreshToken } = await this.createTokens(user.id);
+    const { accessToken, refreshToken } = await this.createTokens(user);
     return { accessToken, refreshToken };
   }
 
@@ -215,17 +215,20 @@ export class AuthService {
     await this.userDataService.update(userId, { refreshToken: rt });
   }
 
-  async createTokens(uId: number): Promise<AuthEntity> {
-    const accessToken = this.jwtService.sign({ uId });
+  async createTokens(user): Promise<AuthEntity> {
+    const accessToken = this.jwtService.sign({
+      uId: user.id,
+      isVerified: user.isVerified,
+    });
     const refreshToken = this.jwtService.sign(
-      { uId },
+      { uId: user.id },
       {
         secret: jwtConstants.refreshSecret,
         expiresIn: jwtConstants.refreshExpiresIn,
       },
     );
 
-    await this.assignRefreshToken(uId, refreshToken);
+    await this.assignRefreshToken(user.id, refreshToken);
 
     return {
       accessToken,

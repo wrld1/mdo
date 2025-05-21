@@ -12,7 +12,6 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { DwellingServiceService } from './dwelling-service.service';
 import { CreateDwellingServiceDto } from './dto/create-dwelling-service.dto';
 import { UpdateDwellingServiceDto } from './dto/update-dwelling-service.dto';
-import { CreateServicePaymentDto } from 'src/service-payment/dto/create-service-payment.dto';
 import { AddPaymentsRequestDto } from './dto/add-payment-request.dto';
 
 @ApiTags('Dwelling-services')

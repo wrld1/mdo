@@ -7,26 +7,34 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
+  Max,
+  Min,
 } from 'class-validator';
 import { DwellingServicePaymentStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 
 export class CreateServicePaymentDto {
   @ApiProperty({
-    example: '2025-05-01T00:00:00.000Z',
-    description: 'Start date of the billing period',
+    example: 5,
+    description: 'Month of the billing period (1-12)',
   })
-  @IsDateString()
+  @IsInt()
+  @Min(1)
+  @Max(12)
   @IsNotEmpty()
-  startDate: string;
+  @Type(() => Number)
+  month: number;
 
   @ApiProperty({
-    example: '2025-05-31T23:59:59.999Z',
-    description: 'End date of the billing period',
+    example: 2025,
+    description: 'Year of the billing period (e.g., 2025)',
   })
-  @IsDateString()
+  @IsInt()
+  @Min(2000)
+  @Max(2100)
   @IsNotEmpty()
-  endDate: string;
+  @Type(() => Number)
+  year: number;
 
   @ApiProperty({ example: '150.75', description: 'Amount due for the period' })
   @IsNumber({ maxDecimalPlaces: 2 })

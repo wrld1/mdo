@@ -70,7 +70,7 @@ Table Object {
 
 Table Dwelling {
   id Int [pk, increment]
-  number Int [unique, not null]
+  number Int [not null]
   floor Int
   entrance Int
   square Int
@@ -110,8 +110,8 @@ Table Service {
 
 Table DwellingServicePayment {
   id Int [pk, increment]
-  startDate DateTime [not null]
-  endDate DateTime [not null]
+  month Int [not null]
+  year Int [not null]
   amount Decimal [not null]
   counter Decimal [not null]
   status DwellingServicePaymentStatus [not null]

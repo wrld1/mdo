@@ -277,8 +277,8 @@ export class DwellingServiceService {
 
           return {
             dwellingServiceId: targetDwellingService.id,
-            startDate: new Date(paymentDto.startDate),
-            endDate: new Date(paymentDto.endDate),
+            month: paymentDto.month,
+            year: paymentDto.year,
             amount: calculatedAmountDecimal,
             counter: paymentDto.counter,
             status: paymentDto.status || DwellingServicePaymentStatus.PENDING,
@@ -294,7 +294,7 @@ export class DwellingServiceService {
           paymentsToCreate,
         );
       return {
-        message: `${result.count} payment(s) created successfully.`,
+        message: `${result.count} платеж(-ів) створено успішно.`,
         count: result.count,
       };
     } catch (error) {
