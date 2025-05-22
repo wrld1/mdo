@@ -1,5 +1,6 @@
 import { DwellingService } from './../dwelling/dwelling.service';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -14,6 +15,7 @@ import { DwellingServicePaymentStatus, Prisma } from '@prisma/client';
 import { CreateServicePaymentDto } from 'src/service-payment/dto/create-service-payment.dto';
 import { ServicePaymentDataService } from 'src/service-payment/service-payment.data-service';
 import { AddPaymentsRequestDto } from './dto/add-payment-request.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class DwellingServiceService {
@@ -24,6 +26,7 @@ export class DwellingServiceService {
     private alsProvider: AsyncLocalStorageProvider,
     private aclService: AclService,
     private servicePaymentDataService: ServicePaymentDataService,
+    private prisma: PrismaService,
   ) {}
 
   async findAll(params?: {
@@ -198,108 +201,163 @@ export class DwellingServiceService {
     }
   }
 
-  async addPayment(dto: AddPaymentsRequestDto) {
-    try {
-      const specificInclude = {
-        service: true,
-        dwelling: { include: { object: { select: { companyId: true } } } },
-      } as const;
+  async addPayments(dtos: AddPaymentsRequestDto | AddPaymentsRequestDto[]) {
+    const requestsArray = Array.isArray(dtos) ? dtos : [dtos];
 
-      let targetDwellingService;
+    if (requestsArray.length === 0) {
+      throw new BadRequestException('Payment requests array cannot be empty.');
+    }
 
-      if (dto.dwellingServiceId) {
-        const ds = await this.dwellingServiceDataService.findById(
-          dto.dwellingServiceId,
-          specificInclude,
-        );
-        if (!ds) {
-          throw new NotFoundException(
-            `DwellingService with ID ${dto.dwellingServiceId} not found.`,
+    const results = [];
+    let processedCount = 0;
+
+    return this.prisma.$transaction(
+      async (tx) => {
+        const specificInclude = {
+          service: true,
+          dwelling: { include: { object: { select: { companyId: true } } } },
+        } as const;
+
+        for (const dto of requestsArray) {
+          if (!dto.payment) {
+            results.push({
+              error: 'Missing payment details in a request.',
+              request: dto,
+            });
+            continue;
+          }
+
+          let targetDwellingService;
+
+          if (dto.dwellingServiceId) {
+            const ds = await this.dwellingServiceDataService.findById(
+              dto.dwellingServiceId,
+              specificInclude,
+            );
+            if (!ds) {
+              results.push({
+                error: `DwellingService with ID ${dto.dwellingServiceId} not found.`,
+                dwellingServiceId: dto.dwellingServiceId,
+              });
+              continue;
+            }
+            targetDwellingService = ds;
+          } else if (dto.dwellingId && dto.serviceId) {
+            const dwellingServices =
+              await this.dwellingServiceDataService.findAll({
+                where: {
+                  dwellingId: dto.dwellingId,
+                  serviceId: dto.serviceId,
+                },
+                include: specificInclude,
+              });
+            if (!dwellingServices || dwellingServices.length === 0) {
+              results.push({
+                error: `DwellingService not found for Dwelling ID ${dto.dwellingId} and Service ID ${dto.serviceId}.`,
+                dwellingId: dto.dwellingId,
+                serviceId: dto.serviceId,
+              });
+              continue;
+            }
+            targetDwellingService = dwellingServices[0];
+          } else {
+            results.push({
+              error:
+                'Either dwellingServiceId or both dwellingId and serviceId must be provided in a request.',
+              request: dto,
+            });
+            continue;
+          }
+
+          if (!targetDwellingService.dwelling?.object?.companyId) {
+            results.push({
+              error: `Associated company not found for DwellingService ID ${targetDwellingService.id}.`,
+              dwellingServiceId: targetDwellingService.id,
+            });
+            continue;
+          }
+          const userId = this.alsProvider.get('uId');
+          if (!userId) {
+            throw new ForbiddenException(
+              'User ID not found in request context.',
+            );
+          }
+          const companyId = targetDwellingService.dwelling.object.companyId;
+          const canAddPaymentPermission = await this.aclService.checkPermission(
+            userId,
+            [`/companyManagement/${companyId}`, 'admin'],
           );
-        }
-        targetDwellingService = ds;
-      } else if (dto.dwellingId && dto.serviceId) {
-        const dwellingServices = await this.dwellingServiceDataService.findAll({
-          where: {
-            dwellingId: dto.dwellingId,
-            serviceId: dto.serviceId,
-          },
-          include: specificInclude,
-        });
-        if (!dwellingServices || dwellingServices.length === 0) {
-          throw new NotFoundException(
-            `DwellingService not found for Dwelling ID ${dto.dwellingId} and Service ID ${dto.serviceId}.`,
-          );
-        }
-        targetDwellingService = dwellingServices[0];
-      } else {
-        throw new ForbiddenException(
-          'Either dwellingServiceId or both dwellingId and serviceId must be provided.',
-        );
-      }
 
-      if (!targetDwellingService.dwelling?.object?.companyId) {
-        throw new NotFoundException(
-          `Associated company not found for the DwellingService.`,
-        );
-      }
-      const userId = this.alsProvider.get('uId');
-      if (!userId) {
-        throw new ForbiddenException('User ID not found in request context.');
-      }
-      const companyId = targetDwellingService.dwelling.object.companyId;
-      const canAddPaymentPermission = await this.aclService.checkPermission(
-        userId,
-        [`/companyManagement/${companyId}`, 'admin'],
-      );
+          if (!canAddPaymentPermission) {
+            results.push({
+              error: `User does not have permission for DwellingService ID ${targetDwellingService.id}.`,
+              dwellingServiceId: targetDwellingService.id,
+            });
+            continue;
+          }
 
-      if (!canAddPaymentPermission) {
-        throw new ForbiddenException(
-          'User does not have permission to add payments for this service.',
-        );
-      }
+          if (
+            !targetDwellingService.service ||
+            targetDwellingService.service.price === null ||
+            targetDwellingService.service.price === undefined
+          ) {
+            results.push({
+              error: `Service details or price not found for DwellingService ID ${targetDwellingService.id}.`,
+              dwellingServiceId: targetDwellingService.id,
+            });
+            continue;
+          }
+          const servicePrice = targetDwellingService.service.price;
+          const paymentDto = dto.payment;
 
-      if (
-        !targetDwellingService.service ||
-        targetDwellingService.service.price === null ||
-        targetDwellingService.service.price === undefined
-      ) {
-        throw new NotFoundException(
-          `Service details or price not found for DwellingService ID ${targetDwellingService.id}. Cannot calculate payment amounts.`,
-        );
-      }
-      const servicePrice = targetDwellingService.service.price;
-
-      const paymentsToCreate: Prisma.DwellingServicePaymentCreateManyInput[] =
-        dto.payments.map((paymentDto) => {
-          const counterValue = paymentDto.counter;
+          const counterValue = new Prisma.Decimal(paymentDto.counter);
           const calculatedAmountDecimal = servicePrice.mul(counterValue);
 
-          return {
-            dwellingServiceId: targetDwellingService.id,
-            month: paymentDto.month,
-            year: paymentDto.year,
+          const dataForUpsert = {
             amount: calculatedAmountDecimal,
-            counter: paymentDto.counter,
+            counter: counterValue,
             status: paymentDto.status || DwellingServicePaymentStatus.PENDING,
           };
-        });
 
-      if (paymentsToCreate.length === 0) {
-        return { message: 'No payments to create.', count: 0 };
-      }
+          try {
+            const upsertedPayment = await tx.dwellingServicePayment.upsert({
+              where: {
+                dwellingServiceId_month_year: {
+                  dwellingServiceId: targetDwellingService.id,
+                  month: paymentDto.month,
+                  year: paymentDto.year,
+                },
+              },
+              create: {
+                dwellingServiceId: targetDwellingService.id,
+                month: paymentDto.month,
+                year: paymentDto.year,
+                ...dataForUpsert,
+              },
+              update: dataForUpsert,
+            });
+            results.push({ success: true, payment: upsertedPayment });
+            processedCount++;
+          } catch (upsertError) {
+            results.push({
+              error: `Failed to upsert payment for DwellingService ID ${targetDwellingService.id}, Month: ${paymentDto.month}, Year: ${paymentDto.year}.`,
+              details: upsertError.message,
+              dwellingServiceId: targetDwellingService.id,
+            });
+          }
+        }
 
-      const result =
-        await this.servicePaymentDataService.createManyPayments(
-          paymentsToCreate,
-        );
-      return {
-        message: `${result.count} платеж(-ів) створено успішно.`,
-        count: result.count,
-      };
-    } catch (error) {
-      console.error(`Error in addPayment:`, error);
-      throw error;
-    }
+        return {
+          message: `${processedCount} із ${requestsArray.length} платеж(-ів) успішно оброблено.`,
+          processedCount,
+          totalRequests: requestsArray.length,
+          results,
+        };
+      },
+      {
+        maxWait: 10000,
+        timeout: 20000,
+      },
+    );
   }
 }

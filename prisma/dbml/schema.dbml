@@ -120,6 +120,10 @@ Table DwellingServicePayment {
   updatedAt DateTime [not null]
   dwellingService DwellingService [not null]
   dwellingServiceId Int [not null]
+
+  indexes {
+    (dwellingServiceId, month, year) [unique]
+  }
 }
 
 Table order {

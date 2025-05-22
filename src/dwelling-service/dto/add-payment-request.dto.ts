@@ -1,12 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsArray,
   IsInt,
   IsOptional,
   ValidateNested,
-  ArrayMinSize,
   ValidateIf,
+  IsDefined,
 } from 'class-validator';
 import { CreateServicePaymentDto } from 'src/service-payment/dto/create-service-payment.dto';
 
@@ -25,7 +24,11 @@ export class AddPaymentsRequestDto {
       'ID of the dwelling. Required if dwellingServiceId is not provided.',
     example: 10,
   })
-  @ValidateIf((o) => !o.dwellingServiceId)
+  @ValidateIf(
+    (o) =>
+      !o.dwellingServiceId &&
+      (o.dwellingId !== undefined || o.serviceId !== undefined),
+  )
   @IsInt()
   dwellingId?: number;
 
@@ -34,18 +37,20 @@ export class AddPaymentsRequestDto {
       'ID of the service. Required if dwellingServiceId is not provided.',
     example: 5,
   })
-  @ValidateIf((o) => !o.dwellingServiceId)
+  @ValidateIf(
+    (o) =>
+      !o.dwellingServiceId &&
+      (o.dwellingId !== undefined || o.serviceId !== undefined),
+  )
   @IsInt()
   serviceId?: number;
 
   @ApiProperty({
-    type: [CreateServicePaymentDto],
-    description: 'Array of payment details to be created.',
-    minItems: 1,
+    type: CreateServicePaymentDto,
+    description: 'Payment details to be created.',
   })
-  @IsArray()
-  @ValidateNested({ each: true })
+  @IsDefined()
+  @ValidateNested()
   @Type(() => CreateServicePaymentDto)
-  @ArrayMinSize(1)
-  payments: CreateServicePaymentDto[];
+  payment: CreateServicePaymentDto;
 }

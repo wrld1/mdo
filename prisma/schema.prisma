@@ -136,6 +136,8 @@ model Service {
   
   dwellingService   DwellingService @relation(fields: [dwellingServiceId], references: [id], onDelete: Cascade)
   dwellingServiceId Int
+
+  @@unique([dwellingServiceId, month, year])
 }
 
 model Order {
